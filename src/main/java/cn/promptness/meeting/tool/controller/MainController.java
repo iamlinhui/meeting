@@ -94,16 +94,16 @@ public class MainController {
 
     @FXML
     public void submit() {
+        // 确认信息
+        MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
         if (taskFutures.isEmpty()) {
-            // 确认信息
-            MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
             if (alertStart(meetingTaskProperties)) {
                 applicationContext.getBean(ValidateUserService.class).start();
                 startTask(meetingTaskProperties);
                 MySystemTray.getTrayIcon().displayMessage("会议室助手", "开启成功", TrayIcon.MessageType.INFO);
             }
         } else {
-            if (alertStop()) {
+            if (alertStop(meetingTaskProperties)) {
                 stopTask();
                 MySystemTray.getTrayIcon().displayMessage("会议室助手", "暂停成功", TrayIcon.MessageType.INFO);
             }
@@ -121,10 +121,11 @@ public class MainController {
         return Objects.equals(ButtonType.OK, buttonType);
     }
 
-    private boolean alertStop() {
+    private boolean alertStop(MeetingTaskProperties meetingTaskProperties) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("暂停会议室助手");
         alert.setHeaderText("确定?");
+        alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
         alert.initOwner(MySystemTray.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
         return Objects.equals(ButtonType.OK, buttonType);
