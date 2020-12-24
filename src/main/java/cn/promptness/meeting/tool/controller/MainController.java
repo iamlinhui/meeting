@@ -97,25 +97,9 @@ public class MainController {
             if (alert(meetingTaskProperties)) {
                 applicationContext.getBean(ValidateUserService.class).start();
                 start(meetingTaskProperties);
-                plusDays.setDisable(true);
-                startTime.setDisable(true);
-                endTime.setDisable(true);
-                cronDescription.setDisable(true);
-                for (CheckBox checkBox : checkBoxList) {
-                    checkBox.setDisable(true);
-                }
-                okButton.setText("暂停");
             }
         } else {
             delete();
-            plusDays.setDisable(false);
-            startTime.setDisable(false);
-            endTime.setDisable(false);
-            cronDescription.setDisable(false);
-            for (CheckBox checkBox : checkBoxList) {
-                checkBox.setDisable(false);
-            }
-            okButton.setText("开启");
         }
     }
 
@@ -150,6 +134,7 @@ public class MainController {
         if (!taskFutures.isEmpty()) {
             ScheduledFuture<?> scheduledFuture = taskFutures.poll();
             scheduledFuture.cancel(true);
+            disable(false);
         }
     }
 
@@ -158,7 +143,19 @@ public class MainController {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
             ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
+            disable(true);
         }
+    }
+
+    private void disable(boolean disable) {
+        plusDays.setDisable(disable);
+        startTime.setDisable(disable);
+        endTime.setDisable(disable);
+        cronDescription.setDisable(disable);
+        for (CheckBox checkBox : checkBoxList) {
+            checkBox.setDisable(disable);
+        }
+        okButton.setText(disable ? "暂停" : "开启");
     }
 
     private void checkSubmit() {
