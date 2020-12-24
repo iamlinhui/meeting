@@ -31,7 +31,7 @@ public class ValidateUserService extends Service<Void> {
             @Override
             protected Void call() throws Exception {
 
-                URIBuilder builder = new URIBuilder("https://m.oa.fenqile.com/meeting/main/due_meeting.json");
+                URIBuilder builder = new URIBuilder("https://api.oa.fenqile.com/oa/api/user/session.json");
                 HttpGet httpGet = new HttpGet();
                 httpGet.setHeader(getHeader());
                 httpGet.setURI(builder.build());

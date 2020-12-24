@@ -9,7 +9,7 @@ public class OpenUtil {
 
     public static void open(int code) {
         // 未登录或登录超时，请重新登录
-        if (90001002 == code) {
+        if (90001002 == code || 19002028 == code) {
             try {
                 String path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe";
                 String target = "http://oa.fenqile.com/";
