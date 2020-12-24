@@ -2,6 +2,7 @@ package cn.promptness.meeting.tool.task;
 
 import cn.promptness.meeting.tool.utils.ChromeCookie;
 import cn.promptness.meeting.tool.utils.ChromeDecryptHelper;
+import cn.promptness.meeting.tool.utils.OpenUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
@@ -19,8 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -55,37 +54,17 @@ public class MeetingTask implements Runnable {
         log.info("---结束发送请求---");
     }
 
-    private boolean isSuccess(String content) throws JSONException, IOException {
+    private boolean isSuccess(String content) throws JSONException {
         JSONObject jsonObject = new JSONObject(content);
         int code = jsonObject.getInt("retcode");
         if (code == 0) {
             return true;
         }
         log.error(jsonObject.getString("retmsg"));
-        open(code);
+        OpenUtil.open(code);
         return false;
     }
 
-    private void open(int code) {
-        // 未登录或登录超时，请重新登录
-        if (90001002 == code) {
-            try {
-                String path = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe";
-                String target = "http://oa.fenqile.com/";
-                List<String> cmd = new ArrayList<>();
-                cmd.add(path);
-                cmd.add("--start-maximized");
-                cmd.add(target);
-                ProcessBuilder process = new ProcessBuilder(cmd);
-                process.start();
-            } catch (Exception e) {
-                try {
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://oa.fenqile.com/");
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
 
     private HttpGet getHttpGet(Header header) {
         HttpGet httpGet = new HttpGet();

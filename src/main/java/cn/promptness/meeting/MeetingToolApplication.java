@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.springframework.boot.Banner;
 import org.springframework.boot.WebApplicationType;
@@ -55,10 +54,6 @@ public class MeetingToolApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-        // 获取屏幕可视化的宽高（Except TaskBar），把窗体设置在可视化的区域居中
-        primaryStage.setX((Screen.getPrimary().getVisualBounds().getWidth() - primaryStage.getWidth()) / 2.0);
-        primaryStage.setY((Screen.getPrimary().getVisualBounds().getHeight() - primaryStage.getHeight()) / 2.0);
-
 
         MySystemTray.getInstance(primaryStage);
     }
