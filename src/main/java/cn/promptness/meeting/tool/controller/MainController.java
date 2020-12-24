@@ -8,7 +8,6 @@ import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -55,22 +54,22 @@ public class MainController {
 
         plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             flag[0] = newValue >= 0 && newValue <= 7;
-            checkSubmit(flag, okButton);
+            checkSubmit();
         });
 
         startTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            extracted(startTime, endTime, flag);
-            checkSubmit(flag, okButton);
+            extracted();
+            checkSubmit();
         });
         endTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            extracted(startTime, endTime, flag);
-            checkSubmit(flag, okButton);
+            extracted();
+            checkSubmit();
         });
 
         cronDescription.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             String value = Constant.CRON_LIST.get(newValue);
             flag[2] = CronSequenceGenerator.isValidExpression(value);
-            checkSubmit(flag, okButton);
+            checkSubmit();
         });
 
         for (Map.Entry<String, String> entry : Constant.ROOM_INFO_LIST.entrySet()) {
@@ -83,26 +82,14 @@ public class MainController {
                     roomIdList.add(checkBox.getId());
                 }
                 flag[3] = !CollectionUtils.isEmpty(roomIdList);
-                checkSubmit(flag, okButton);
+                checkSubmit();
             });
             checkBoxList.add(checkBox);
         }
-        GridPane grid = getGridPane(okButton, plusDays, startTime, endTime, cronDescription, checkBoxList);
-
-        pane.getChildren().add(grid);
+        pane.getChildren().add(buildGridPane());
     }
 
-    private boolean alert(MeetingTaskProperties meetingTaskProperties) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("确认开启会议室助手");
-        alert.setHeaderText("配置信息");
-        alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
-
-        alert.initOwner(MySystemTray.getPrimaryStage());
-        ButtonType buttonType = alert.showAndWait().orElse(null);
-        return Objects.equals(ButtonType.OK, buttonType);
-    }
-
+    @FXML
     public void submit() {
         if (taskFutures.isEmpty()) {
             // 确认信息
@@ -132,7 +119,18 @@ public class MainController {
         }
     }
 
-    private void extracted(ChoiceBox<String> startTime, ChoiceBox<String> endTime, boolean[] flag) {
+    private boolean alert(MeetingTaskProperties meetingTaskProperties) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("开启会议室助手");
+        alert.setHeaderText("配置信息");
+        alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        ButtonType buttonType = alert.showAndWait().orElse(null);
+        return Objects.equals(ButtonType.OK, buttonType);
+    }
+
+    private void extracted() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
         try {
             if (StringUtils.isEmpty(startTime.getValue()) || StringUtils.isEmpty(endTime.getValue())) {
@@ -148,14 +146,14 @@ public class MainController {
     }
 
 
-    public void delete() {
+    private void delete() {
         if (!taskFutures.isEmpty()) {
             ScheduledFuture<?> scheduledFuture = taskFutures.poll();
             scheduledFuture.cancel(true);
         }
     }
 
-    public void start(MeetingTaskProperties meetingTaskProperties) {
+    private void start(MeetingTaskProperties meetingTaskProperties) {
         if (taskFutures.isEmpty()) {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
             ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
@@ -163,7 +161,7 @@ public class MainController {
         }
     }
 
-    private void checkSubmit(boolean[] flag, Node okButton) {
+    private void checkSubmit() {
         boolean result = true;
         for (boolean b : flag) {
             result &= b;
@@ -171,7 +169,7 @@ public class MainController {
         okButton.setDisable(!result);
     }
 
-    private GridPane getGridPane(Button okButton, ChoiceBox<Integer> plusDays, ChoiceBox<String> startTime, ChoiceBox<String> endTime, ChoiceBox<String> cron, ArrayList<CheckBox> checkBoxList) {
+    private GridPane buildGridPane() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -186,7 +184,7 @@ public class MainController {
         grid.add(endTime, 5, 0);
 
         grid.add(new Label("触发周期:"), 0, 1);
-        grid.add(cron, 1, 1);
+        grid.add(cronDescription, 1, 1);
 
         grid.add(new Label("预定列表:"), 0, 2);
         for (int i = 0; i < checkBoxList.size(); i++) {

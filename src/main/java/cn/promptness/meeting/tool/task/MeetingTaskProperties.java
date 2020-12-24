@@ -40,7 +40,7 @@ public class MeetingTaskProperties {
     }
 
     public String mockCron() {
-        StringBuilder format = new StringBuilder("最近的运行时间:\n");
+        StringBuilder format = new StringBuilder("即将运行的时间:\n");
         Date now = new Date();
         for (int i = 0; i < BigDecimal.TEN.intValue(); i++) {
             CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(getCron());
