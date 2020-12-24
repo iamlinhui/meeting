@@ -8,6 +8,8 @@ import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -20,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -94,21 +97,34 @@ public class MainController {
         if (taskFutures.isEmpty()) {
             // 确认信息
             MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
-            if (alert(meetingTaskProperties)) {
+            if (alertStart(meetingTaskProperties)) {
                 applicationContext.getBean(ValidateUserService.class).start();
-                start(meetingTaskProperties);
+                startTask(meetingTaskProperties);
+                MySystemTray.getTrayIcon().displayMessage("会议室助手", "开启成功", TrayIcon.MessageType.INFO);
             }
         } else {
-            delete();
+            if (alertStop()) {
+                stopTask();
+                MySystemTray.getTrayIcon().displayMessage("会议室助手", "暂停成功", TrayIcon.MessageType.INFO);
+            }
         }
     }
 
-    private boolean alert(MeetingTaskProperties meetingTaskProperties) {
+    private boolean alertStart(MeetingTaskProperties meetingTaskProperties) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("开启会议室助手");
         alert.setHeaderText("配置信息");
         alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
 
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        ButtonType buttonType = alert.showAndWait().orElse(null);
+        return Objects.equals(ButtonType.OK, buttonType);
+    }
+
+    private boolean alertStop() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("暂停会议室助手");
+        alert.setHeaderText("确定?");
         alert.initOwner(MySystemTray.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
         return Objects.equals(ButtonType.OK, buttonType);
@@ -130,7 +146,7 @@ public class MainController {
     }
 
 
-    private void delete() {
+    private void stopTask() {
         if (!taskFutures.isEmpty()) {
             ScheduledFuture<?> scheduledFuture = taskFutures.poll();
             scheduledFuture.cancel(true);
@@ -138,7 +154,7 @@ public class MainController {
         }
     }
 
-    private void start(MeetingTaskProperties meetingTaskProperties) {
+    private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (taskFutures.isEmpty()) {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
             ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));

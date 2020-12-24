@@ -22,6 +22,7 @@ public class MySystemTray {
     private static MySystemTray instance;
     private static MenuItem showItem;
     private static MenuItem exitItem;
+    @Getter
     private static TrayIcon trayIcon;
     private static ActionListener showListener;
     private static ActionListener exitListener;
