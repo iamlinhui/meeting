@@ -169,7 +169,7 @@ public class MainController {
         for (CheckBox checkBox : checkBoxList) {
             checkBox.setDisable(disable);
         }
-        okButton.setText(disable ? "暂停" : "开启");
+        okButton.setText(disable ? "     暂停     " : "     开启     ");
     }
 
     private void checkSubmit() {

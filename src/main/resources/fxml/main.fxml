@@ -25,6 +25,6 @@
             </MenuBar>
         </top>
     </BorderPane>
-    <Button mnemonicParsing="false" disable="true" text="开启" fx:id="okButton" onAction="#submit"/>
+    <Button mnemonicParsing="false" disable="true" text="     开启     " fx:id="okButton" onAction="#submit"/>
 
 </Pane>
