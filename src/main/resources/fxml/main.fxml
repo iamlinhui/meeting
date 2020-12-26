@@ -13,7 +13,13 @@
                 <Menu text="编辑">
                     <items>
                         <MenuItem text="重置" onAction="#clear"></MenuItem>
+                        <MenuItem text="退出" onAction="#exit"></MenuItem>
+                    </items>
+                </Menu>
+                <Menu text="查看">
+                    <items>
                         <MenuItem text="状态" onAction="#show"></MenuItem>
+                        <MenuItem text="列表" onAction="#list"></MenuItem>
                     </items>
                 </Menu>
                 <Menu text="帮助">

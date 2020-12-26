@@ -2,17 +2,24 @@ package cn.promptness.meeting.tool.controller;
 
 import cn.promptness.meeting.tool.MySystemTray;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.StageStyle;
+import org.json.JSONArray;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -265,5 +272,32 @@ public class MainController {
             alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
         }
         alert.showAndWait();
+    }
+
+    @FXML
+    public void exit() {
+        System.exit(0);
+    }
+
+    @FXML
+    public void list() {
+
+        MeetingRoomService meetingRoomService = applicationContext.getBean(MeetingRoomService.class);
+        meetingRoomService.start();
+        ReadOnlyObjectProperty<JSONArray> property = meetingRoomService.valueProperty();
+
+
+        System.out.println(property.get());
+
+
+        ButtonType cancel = new ButtonType("取消会议室");
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("会议室助手");
+        dialog.setHeaderText("成功列表");
+
+        dialog.getDialogPane().getButtonTypes().add(cancel);
+
+
     }
 }
