@@ -2,24 +2,26 @@ package cn.promptness.meeting.tool.controller;
 
 import cn.promptness.meeting.tool.MySystemTray;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.stage.StageStyle;
+import javafx.scene.text.Text;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -284,19 +286,66 @@ public class MainController {
 
         MeetingRoomService meetingRoomService = applicationContext.getBean(MeetingRoomService.class);
         meetingRoomService.start();
-        ReadOnlyObjectProperty<JSONArray> property = meetingRoomService.valueProperty();
+
+        meetingRoomService.setOnSucceeded(event -> {
+            if (event.getSource().getValue() == null) {
+                return;
+            }
+            JSONArray value = (JSONArray) event.getSource().getValue();
+
+            ArrayList<String> cancelList = new ArrayList<>();
+            ButtonType cancel = new ButtonType("取消会议室");
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("会议室助手");
+            dialog.setHeaderText("成功列表");
+            dialog.initOwner(MySystemTray.getPrimaryStage());
+            dialog.getDialogPane().getButtonTypes().add(cancel);
 
 
-        System.out.println(property.get());
+            GridPane gridPane = new GridPane();
+            gridPane.getColumnConstraints().addAll(new ColumnConstraints(50), new ColumnConstraints(200), new ColumnConstraints(150), new ColumnConstraints(100), new ColumnConstraints(100));
+            gridPane.setAlignment(Pos.CENTER);
+            gridPane.setPadding(new Insets(20));
+            gridPane.add(new Text(), 0, 0);
+            gridPane.add(new Text("会议地点"), 1, 0);
+            gridPane.add(new Text("会议日期"), 2, 0);
+            gridPane.add(new Text("开始时间"), 3, 0);
+            gridPane.add(new Text("结束时间"), 4, 0);
+            for (int i = 0; i < value.length(); i++) {
 
+                try {
+                    JSONObject jsonObject = value.getJSONObject(i);
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.setId(jsonObject.get("meeting_id").toString());
 
-        ButtonType cancel = new ButtonType("取消会议室");
+                    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                        cancelList.remove(checkBox.getId());
+                        if (checkBox.isSelected()) {
+                            cancelList.add(checkBox.getId());
+                        }
+                    });
 
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("会议室助手");
-        dialog.setHeaderText("成功列表");
+                    gridPane.add(checkBox, 0, i + 1);
+                    gridPane.add(new Text(jsonObject.get("floor") + "F" + jsonObject.getString("room_name")), 1, i + 1);
+                    gridPane.add(new Text(jsonObject.getString("meeting_date")), 2, i + 1);
 
-        dialog.getDialogPane().getButtonTypes().add(cancel);
+                    gridPane.add(new Text(jsonObject.getString("start_time")), 3, i + 1);
+                    gridPane.add(new Text(jsonObject.getString("end_time")), 4, i + 1);
+
+                } catch (JSONException ignored) {
+                }
+
+                dialog.getDialogPane().setContent(gridPane);
+            }
+
+            ButtonType buttonType = dialog.showAndWait().orElse(null);
+            if (Objects.equals(cancel, buttonType)) {
+                for (String meetingId : cancelList) {
+                    applicationContext.getBean(CancelMeetingRoomService.class).setMeetingId(meetingId).start();
+                }
+            }
+        });
 
 
     }

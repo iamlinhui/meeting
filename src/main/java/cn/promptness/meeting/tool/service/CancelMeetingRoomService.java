@@ -8,7 +8,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,17 +16,19 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Scope("prototype")
-public class MeetingRoomService extends Service<JSONArray> {
+public class CancelMeetingRoomService extends Service<Void> {
 
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
 
-    @Override
-    protected Task<JSONArray> createTask() {
-        return new Task<JSONArray>() {
-            @Override
-            protected JSONArray call() throws Exception {
+    private String meetingId;
 
-                URIBuilder builder = new URIBuilder("https://m.oa.fenqile.com/meeting/main/query_rooms.json");
+    @Override
+    protected Task<Void> createTask() {
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+
+                URIBuilder builder = new URIBuilder(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", meetingId));
                 HttpGet httpGet = new HttpGet();
                 httpGet.setHeader(OpenUtil.getHeader());
                 httpGet.setURI(builder.build());
@@ -36,14 +37,20 @@ public class MeetingRoomService extends Service<JSONArray> {
                     String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
                     JSONObject jsonObject = new JSONObject(content);
                     int code = jsonObject.getInt("retcode");
-                    boolean open = OpenUtil.open(code);
-                    if (open) {
-                        return null;
-                    }
-                    return jsonObject.has("result_rows") ? jsonObject.getJSONArray("result_rows") : new JSONArray();
+                    OpenUtil.open(code);
+                    return null;
                 }
             }
         };
     }
 
+
+    public String getMeetingId() {
+        return meetingId;
+    }
+
+    public CancelMeetingRoomService setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
+        return this;
+    }
 }
