@@ -11,8 +11,8 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -25,10 +25,7 @@ import javax.annotation.Resource;
 import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 
@@ -40,7 +37,7 @@ public class MainController {
     @Resource
     private ConfigurableApplicationContext applicationContext;
     @FXML
-    private Pane pane;
+    private BorderPane pane;
     @FXML
     private Button okButton;
 
@@ -56,7 +53,7 @@ public class MainController {
     public void initialize() {
 
         plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            flag[0] = newValue >= 0 && newValue <= 7;
+            flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
             checkSubmit();
         });
 
@@ -89,7 +86,7 @@ public class MainController {
             });
             checkBoxList.add(checkBox);
         }
-        pane.getChildren().add(buildGridPane());
+        pane.setCenter(buildGridPane());
     }
 
     @FXML
@@ -187,7 +184,7 @@ public class MainController {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 50, 20, 10));
+        grid.setPadding(new Insets(10, 50, 20, 10));
 
         grid.add(new Label("偏移天数:"), 0, 0);
         grid.add(plusDays, 1, 0);
@@ -208,4 +205,65 @@ public class MainController {
         return grid;
     }
 
+    @FXML
+    public void clear() {
+        if (taskFutures.isEmpty()) {
+            plusDays.setValue(null);
+            startTime.setValue(null);
+            endTime.setValue(null);
+            cronDescription.setValue(null);
+            for (CheckBox checkBox : checkBoxList) {
+                checkBox.setSelected(false);
+            }
+            roomIdList.clear();
+            okButton.setDisable(true);
+            Arrays.fill(flag, false);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.NONE);
+            alert.setTitle("会议室助手");
+            alert.setHeaderText("重置配置");
+            alert.initOwner(MySystemTray.getPrimaryStage());
+            alert.getButtonTypes().add(ButtonType.CLOSE);
+            alert.setContentText("请先暂停任务!");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    public void about() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("会议室助手");
+        alert.setHeaderText("关于");
+        alert.setContentText("Version 1.0.0\nPowered By Lynn");
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.getButtonTypes().add(ButtonType.CLOSE);
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void instruction() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("会议室助手");
+        alert.setHeaderText("使用说明");
+        alert.setContentText("1.保持Chrome浏览器中http://oa.fenqile.com/地址能登录成功\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.getButtonTypes().add(ButtonType.CLOSE);
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void show() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("会议室助手");
+        alert.setHeaderText("运行状态");
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.getButtonTypes().add(ButtonType.CLOSE);
+        if (taskFutures.isEmpty()) {
+            alert.setContentText("请先开启任务!");
+        } else {
+            MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
+            alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+        }
+        alert.showAndWait();
+    }
 }

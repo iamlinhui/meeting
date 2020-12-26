@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <Pane fx:controller="cn.promptness.meeting.tool.controller.MainController" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1">
-    <Pane fx:id="pane">
-        <children></children>
-    </Pane>
+    <BorderPane fx:id="pane">
+        <top>
+            <MenuBar fx:id="menuBar">
+                <Menu text="编辑">
+                    <items>
+                        <MenuItem text="重置" onAction="#clear"></MenuItem>
+                        <MenuItem text="状态" onAction="#show"></MenuItem>
+                    </items>
+                </Menu>
+                <Menu text="帮助">
+                    <items>
+                        <MenuItem text="说明" onAction="#instruction"></MenuItem>
+                        <MenuItem text="关于" onAction="#about"></MenuItem>
+                    </items>
+                </Menu>
+            </MenuBar>
+        </top>
+    </BorderPane>
     <Button mnemonicParsing="false" disable="true" text="开启" fx:id="okButton" onAction="#submit"/>
 
 </Pane>
