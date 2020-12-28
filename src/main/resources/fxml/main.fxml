@@ -1,36 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
-<Pane fx:controller="cn.promptness.meeting.tool.controller.MainController" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1">
-    <BorderPane fx:id="pane">
-        <top>
-            <MenuBar fx:id="menuBar">
-                <Menu text="编辑">
-                    <items>
-                        <MenuItem text="重置" onAction="#clear"></MenuItem>
-                        <MenuItem text="退出" onAction="#exit"></MenuItem>
-                    </items>
-                </Menu>
-                <Menu text="查看">
-                    <items>
-                        <MenuItem text="状态" onAction="#show"></MenuItem>
-                        <MenuItem text="列表" onAction="#list"></MenuItem>
-                    </items>
-                </Menu>
-                <Menu text="帮助">
-                    <items>
-                        <MenuItem text="说明" onAction="#instruction"></MenuItem>
-                        <MenuItem text="关于" onAction="#about"></MenuItem>
-                    </items>
-                </Menu>
-            </MenuBar>
-        </top>
-    </BorderPane>
-    <Button mnemonicParsing="false" disable="true" text="     开启     " fx:id="okButton" onAction="#submit"/>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:controller="cn.promptness.meeting.tool.controller.MainController" maxHeight="-Infinity"
+            maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <MenuBar>
+            <Menu text="编辑">
+                <MenuItem text="重置" onAction="#clear"/>
+                <MenuItem text="退出" onAction="#exit"/>
+            </Menu>
+            <Menu text="查看">
+                <MenuItem text="状态" onAction="#show"/>
+                <MenuItem text="列表" onAction="#list"/>
+            </Menu>
+            <Menu text="帮助">
+                <MenuItem text="说明" onAction="#instruction"/>
+                <MenuItem text="关于" onAction="#about"/>
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+        <GridPane hgap="10" vgap="10" fx:id="gridPane">
+            <padding>
+                <Insets top="10" right="50" bottom="20" left="10"/>
+            </padding>
+            <Label text="偏移天数:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ChoiceBox fx:id="plusDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <Label text="会议时间:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            <ChoiceBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+            <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+            <ChoiceBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+            <Label text="触发周期:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ChoiceBox fx:id="cronDescription" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        </GridPane>
+    </center>
+    <Button minWidth="80" maxWidth="80" prefWidth="80" mnemonicParsing="false" disable="true" text="开启" fx:id="okButton" onAction="#submit"/>
 
-</Pane>
+</BorderPane>

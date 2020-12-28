@@ -13,9 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
@@ -46,20 +44,29 @@ public class MainController {
     @Resource
     private ConfigurableApplicationContext applicationContext;
     @FXML
-    private BorderPane pane;
-    @FXML
     private Button okButton;
+    @FXML
+    public GridPane gridPane;
+    @FXML
+    private ChoiceBox<Integer> plusDays;
+    @FXML
+    private ChoiceBox<String> startTime;
+    @FXML
+    private ChoiceBox<String> endTime;
+    @FXML
+    private ChoiceBox<String> cronDescription;
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
-    private final ChoiceBox<Integer> plusDays = new ChoiceBox<>(FXCollections.observableArrayList(7, 6, 5, 4, 3, 2, 1, 0));
-    private final ChoiceBox<String> startTime = new ChoiceBox<>(FXCollections.observableArrayList(Constant.ITEMS));
-    private final ChoiceBox<String> endTime = new ChoiceBox<>(FXCollections.observableArrayList(Constant.ITEMS));
-    private final ChoiceBox<String> cronDescription = new ChoiceBox<>(FXCollections.observableArrayList(Constant.CRON_LIST.keySet()));
     private final ArrayList<String> roomIdList = new ArrayList<>();
     private final ArrayList<CheckBox> checkBoxList = new ArrayList<>();
     private final boolean[] flag = {false, false, false, false};
 
     public void initialize() {
+
+        plusDays.setItems(FXCollections.observableArrayList(7, 6, 5, 4, 3, 2, 1, 0));
+        startTime.setItems(FXCollections.observableArrayList(Constant.ITEMS));
+        endTime.setItems(FXCollections.observableArrayList(Constant.ITEMS));
+        cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_LIST.keySet()));
 
         plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
@@ -95,7 +102,8 @@ public class MainController {
             });
             checkBoxList.add(checkBox);
         }
-        pane.setCenter(buildGridPane());
+
+        initGridPane();
     }
 
     @FXML
@@ -178,7 +186,7 @@ public class MainController {
         for (CheckBox checkBox : checkBoxList) {
             checkBox.setDisable(disable);
         }
-        okButton.setText(disable ? "     暂停     " : "     开启     ");
+        okButton.setText(disable ? "暂停" : "开启");
     }
 
     private void checkSubmit() {
@@ -189,29 +197,11 @@ public class MainController {
         okButton.setDisable(!result);
     }
 
-    private GridPane buildGridPane() {
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 50, 20, 10));
-
-        grid.add(new Label("偏移天数:"), 0, 0);
-        grid.add(plusDays, 1, 0);
-
-        grid.add(new Label("会议时间:"), 2, 0);
-        grid.add(startTime, 3, 0);
-        grid.add(new Label("~"), 4, 0);
-        grid.add(endTime, 5, 0);
-
-        grid.add(new Label("触发周期:"), 0, 1);
-        grid.add(cronDescription, 1, 1);
-
-        grid.add(new Label("预定列表:"), 0, 2);
+    private void initGridPane() {
         for (int i = 0; i < checkBoxList.size(); i++) {
-            grid.add(checkBoxList.get(i), 1 + i / 10, 2 + i - (i / 10) * 10);
+            gridPane.add(checkBoxList.get(i), 1 + i / 10, 2 + i - (i / 10) * 10);
         }
-        grid.add(okButton, 5, 2 + checkBoxList.size() - 1 - ((checkBoxList.size() - 1) / 10) * 10);
-        return grid;
+        gridPane.add(okButton, 5, 2 + checkBoxList.size() - 1 - ((checkBoxList.size() - 1) / 10) * 10);
     }
 
     @FXML
@@ -303,15 +293,15 @@ public class MainController {
             dialog.getDialogPane().getButtonTypes().add(cancel);
 
 
-            GridPane gridPane = new GridPane();
-            gridPane.getColumnConstraints().addAll(new ColumnConstraints(50), new ColumnConstraints(200), new ColumnConstraints(150), new ColumnConstraints(100), new ColumnConstraints(100));
-            gridPane.setAlignment(Pos.CENTER);
-            gridPane.setPadding(new Insets(20));
-            gridPane.add(new Text(), 0, 0);
-            gridPane.add(new Text("会议地点"), 1, 0);
-            gridPane.add(new Text("会议日期"), 2, 0);
-            gridPane.add(new Text("开始时间"), 3, 0);
-            gridPane.add(new Text("结束时间"), 4, 0);
+            GridPane grid = new GridPane();
+            grid.getColumnConstraints().addAll(new ColumnConstraints(50), new ColumnConstraints(200), new ColumnConstraints(150), new ColumnConstraints(100), new ColumnConstraints(100));
+            grid.setAlignment(Pos.CENTER);
+            grid.setPadding(new Insets(20));
+            grid.add(new Text(), 0, 0);
+            grid.add(new Text("会议地点"), 1, 0);
+            grid.add(new Text("会议日期"), 2, 0);
+            grid.add(new Text("开始时间"), 3, 0);
+            grid.add(new Text("结束时间"), 4, 0);
             for (int i = 0; i < value.length(); i++) {
 
                 try {
@@ -326,17 +316,17 @@ public class MainController {
                         }
                     });
 
-                    gridPane.add(checkBox, 0, i + 1);
-                    gridPane.add(new Text(jsonObject.get("floor") + "F" + jsonObject.getString("room_name")), 1, i + 1);
-                    gridPane.add(new Text(jsonObject.getString("meeting_date")), 2, i + 1);
+                    grid.add(checkBox, 0, i + 1);
+                    grid.add(new Text(jsonObject.get("floor") + "F" + jsonObject.getString("room_name")), 1, i + 1);
+                    grid.add(new Text(jsonObject.getString("meeting_date")), 2, i + 1);
 
-                    gridPane.add(new Text(jsonObject.getString("start_time")), 3, i + 1);
-                    gridPane.add(new Text(jsonObject.getString("end_time")), 4, i + 1);
+                    grid.add(new Text(jsonObject.getString("start_time")), 3, i + 1);
+                    grid.add(new Text(jsonObject.getString("end_time")), 4, i + 1);
 
                 } catch (JSONException ignored) {
                 }
 
-                dialog.getDialogPane().setContent(gridPane);
+                dialog.getDialogPane().setContent(grid);
             }
 
             ButtonType buttonType = dialog.showAndWait().orElse(null);
