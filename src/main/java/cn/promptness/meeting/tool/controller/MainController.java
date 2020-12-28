@@ -7,6 +7,7 @@ import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
+import cn.promptness.meeting.tool.utils.OpenUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -294,19 +295,19 @@ public class MainController {
 
 
             GridPane grid = new GridPane();
-            grid.getColumnConstraints().addAll(new ColumnConstraints(50), new ColumnConstraints(200), new ColumnConstraints(150), new ColumnConstraints(100), new ColumnConstraints(100));
-            grid.setAlignment(Pos.CENTER);
+            grid.setHgap(10);
+            grid.setVgap(10);
             grid.setPadding(new Insets(20));
-            grid.add(new Text(), 0, 0);
-            grid.add(new Text("会议地点"), 1, 0);
-            grid.add(new Text("会议日期"), 2, 0);
-            grid.add(new Text("开始时间"), 3, 0);
-            grid.add(new Text("结束时间"), 4, 0);
+            grid.add(new Text("会议地点"), 0, 0);
+            grid.add(new Text("会议日期"), 1, 0);
+            grid.add(new Text("开始时间"), 2, 0);
+            grid.add(new Text("结束时间"), 3, 0);
+            grid.add(new Text("星期"), 4, 0);
             for (int i = 0; i < value.length(); i++) {
 
                 try {
                     JSONObject jsonObject = value.getJSONObject(i);
-                    CheckBox checkBox = new CheckBox();
+                    CheckBox checkBox = new CheckBox(jsonObject.get("floor") + "F" + jsonObject.getString("room_name"));
                     checkBox.setId(jsonObject.get("meeting_id").toString());
 
                     checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -317,11 +318,11 @@ public class MainController {
                     });
 
                     grid.add(checkBox, 0, i + 1);
-                    grid.add(new Text(jsonObject.get("floor") + "F" + jsonObject.getString("room_name")), 1, i + 1);
-                    grid.add(new Text(jsonObject.getString("meeting_date")), 2, i + 1);
-
-                    grid.add(new Text(jsonObject.getString("start_time")), 3, i + 1);
-                    grid.add(new Text(jsonObject.getString("end_time")), 4, i + 1);
+                    String meetingDate = jsonObject.getString("meeting_date");
+                    grid.add(new Text(meetingDate), 1, i + 1);
+                    grid.add(new Text(jsonObject.getString("start_time")), 2, i + 1);
+                    grid.add(new Text(jsonObject.getString("end_time")), 3, i + 1);
+                    grid.add(new Text(OpenUtil.dateToWeek(meetingDate)), 4, i + 1);
 
                 } catch (JSONException ignored) {
                 }
