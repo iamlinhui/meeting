@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Constant {
+
+    public static final String TITLE = "会议室助手";
+
     public static final Map<String, String> ROOM_INFO_LIST = new LinkedHashMap<>();
 
     public static final Map<String, String> CRON_LIST = new LinkedHashMap<>();

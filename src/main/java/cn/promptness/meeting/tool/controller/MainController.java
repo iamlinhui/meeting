@@ -11,11 +11,9 @@ import cn.promptness.meeting.tool.utils.OpenUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.*;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import org.json.JSONArray;
@@ -115,12 +113,12 @@ public class MainController {
             if (alertStart(meetingTaskProperties)) {
                 applicationContext.getBean(ValidateUserService.class).start();
                 startTask(meetingTaskProperties);
-                MySystemTray.getTrayIcon().displayMessage("会议室助手", "开启成功", TrayIcon.MessageType.INFO);
+                MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "开启成功", TrayIcon.MessageType.INFO);
             }
         } else {
             if (alertStop(meetingTaskProperties)) {
                 stopTask();
-                MySystemTray.getTrayIcon().displayMessage("会议室助手", "暂停成功", TrayIcon.MessageType.INFO);
+                MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "暂停成功", TrayIcon.MessageType.INFO);
             }
         }
     }
@@ -220,7 +218,7 @@ public class MainController {
             Arrays.fill(flag, false);
         } else {
             Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle("会议室助手");
+            alert.setTitle(Constant.TITLE);
             alert.setHeaderText("重置配置");
             alert.initOwner(MySystemTray.getPrimaryStage());
             alert.getButtonTypes().add(ButtonType.CLOSE);
@@ -232,7 +230,7 @@ public class MainController {
     @FXML
     public void about() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.setTitle("会议室助手");
+        alert.setTitle(Constant.TITLE);
         alert.setHeaderText("关于");
         alert.setContentText("Version 1.0.0\nPowered By Lynn");
         alert.initOwner(MySystemTray.getPrimaryStage());
@@ -243,7 +241,7 @@ public class MainController {
     @FXML
     public void instruction() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.setTitle("会议室助手");
+        alert.setTitle(Constant.TITLE);
         alert.setHeaderText("使用说明");
         alert.setContentText("1.保持Chrome浏览器中http://oa.fenqile.com/地址能登录成功\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
         alert.initOwner(MySystemTray.getPrimaryStage());
@@ -254,7 +252,7 @@ public class MainController {
     @FXML
     public void show() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.setTitle("会议室助手");
+        alert.setTitle(Constant.TITLE);
         alert.setHeaderText("运行状态");
         alert.initOwner(MySystemTray.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
@@ -288,7 +286,7 @@ public class MainController {
             ButtonType cancel = new ButtonType("取消会议室");
 
             Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("会议室助手");
+            dialog.setTitle(Constant.TITLE);
             dialog.setHeaderText("成功列表");
             dialog.initOwner(MySystemTray.getPrimaryStage());
             dialog.getDialogPane().getButtonTypes().add(cancel);
