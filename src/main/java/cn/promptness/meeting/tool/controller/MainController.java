@@ -232,7 +232,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("关于");
-        alert.setContentText("Version 1.0.0\nPowered By Lynn");
+        alert.setContentText("Version 1.0.1\nPowered By Lynn");
         alert.initOwner(MySystemTray.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();

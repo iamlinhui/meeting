@@ -2,7 +2,6 @@ package cn.promptness.meeting;
 
 import cn.promptness.meeting.tool.MySystemTray;
 import cn.promptness.meeting.tool.SpringFXMLLoader;
-import cn.promptness.meeting.tool.service.ValidateUserService;
 import com.github.windpapi4j.WinDPAPI;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -37,7 +36,6 @@ public class MeetingToolApplication extends Application {
     @Override
     public void init() {
         applicationContext = new SpringApplicationBuilder().sources(MeetingToolApplication.class).bannerMode(Banner.Mode.OFF).web(WebApplicationType.NONE).run(getParameters().getRaw().toArray(new String[0]));
-        applicationContext.getBean(ValidateUserService.class).start();
     }
 
 
