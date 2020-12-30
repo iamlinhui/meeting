@@ -19,6 +19,8 @@ import javafx.scene.text.Text;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.info.GitProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -38,6 +40,8 @@ import java.util.concurrent.ScheduledFuture;
 @Controller
 public class MainController {
 
+    @Resource
+    private BuildProperties buildProperties;
     @Resource
     private TaskScheduler taskScheduler;
     @Resource
@@ -232,7 +236,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("关于");
-        alert.setContentText("Version 1.0.1\nPowered By Lynn");
+        alert.setContentText("Version " + buildProperties.getVersion() + "\nPowered By Lynn");
         alert.initOwner(MySystemTray.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
