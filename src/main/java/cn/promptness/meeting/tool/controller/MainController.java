@@ -3,19 +3,29 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.MySystemTray;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
+import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
+import cn.promptness.meeting.tool.utils.MdUtil;
 import cn.promptness.meeting.tool.utils.OpenUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +49,10 @@ import java.util.concurrent.ScheduledFuture;
 @Controller
 public class MainController {
 
+    @FXML
+    public Menu accountTitle;
+    @FXML
+    public MenuItem accountAction;
     @Resource
     private BuildProperties buildProperties;
     @Resource
@@ -113,11 +127,22 @@ public class MainController {
         // 确认信息
         MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
         if (taskFutures.isEmpty()) {
-            if (alertStart(meetingTaskProperties)) {
-                applicationContext.getBean(ValidateUserService.class).start();
-                startTask(meetingTaskProperties);
-                MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "开启成功", TrayIcon.MessageType.INFO);
-            }
+
+            ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
+            validateUserService.start();
+            validateUserService.setOnSucceeded(event -> {
+                if (StringUtils.isEmpty(event.getSource().getValue())) {
+                    OpenUtil.logout();
+                    accountAction.setText("登录");
+                    accountTitle.setText("账户");
+                    account();
+                    return;
+                }
+                if (alertStart(meetingTaskProperties)) {
+                    startTask(meetingTaskProperties);
+                    MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "开启成功", TrayIcon.MessageType.INFO);
+                }
+            });
         } else {
             if (alertStop(meetingTaskProperties)) {
                 stopTask();
@@ -246,7 +271,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("使用说明");
-        alert.setContentText("1.保持Chrome浏览器中http://oa.fenqile.com/地址能登录成功\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
+        alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
         alert.initOwner(MySystemTray.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
@@ -262,8 +287,19 @@ public class MainController {
         if (taskFutures.isEmpty()) {
             alert.setContentText("请先开启任务!");
         } else {
-            MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
-            alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+            ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
+            validateUserService.start();
+            validateUserService.setOnSucceeded(event -> {
+                if (StringUtils.isEmpty(event.getSource().getValue())) {
+                    OpenUtil.logout();
+                    accountAction.setText("登录");
+                    accountTitle.setText("账户");
+                    account();
+                    return;
+                }
+                MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
+                alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+            });
         }
         alert.showAndWait();
     }
@@ -281,6 +317,10 @@ public class MainController {
 
         meetingRoomService.setOnSucceeded(event -> {
             if (event.getSource().getValue() == null) {
+                OpenUtil.logout();
+                accountAction.setText("登录");
+                accountTitle.setText("账户");
+                account();
                 return;
             }
             JSONArray value = (JSONArray) event.getSource().getValue();
@@ -341,4 +381,51 @@ public class MainController {
 
 
     }
+
+    @FXML
+    public void account() {
+
+        if (OpenUtil.haveAccount()) {
+            OpenUtil.logout();
+            accountAction.setText("登录");
+            accountTitle.setText("账户");
+            return;
+        }
+
+        String currentTimeMillis = String.valueOf(System.currentTimeMillis());
+        String token = MdUtil.encipher(currentTimeMillis);
+        ImageView imageView = new ImageView("https://passport.oa.fenqile.com/user/main/qrcode.png?token=" + token);
+
+        VBox layout = new VBox(10);
+        layout.getChildren().add(imageView);
+
+        Scene scene = new Scene(layout);
+
+        Stage alert = new Stage();
+        alert.setTitle(Constant.TITLE);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.getIcons().add(new Image("/icon.jpg"));
+        alert.setResizable(false);
+        alert.setScene(scene);
+        alert.show();
+
+        CheckLoginService checkLoginService = applicationContext.getBean(CheckLoginService.class).setAlert(alert).setToken(token).setTime(currentTimeMillis);
+        checkLoginService.start();
+
+        checkLoginService.setOnSucceeded(event -> {
+            if (Objects.equals(Boolean.TRUE, event.getSource().getValue())) {
+                ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
+                validateUserService.start();
+                validateUserService.setOnSucceeded(validateEvent -> {
+                    if (!StringUtils.isEmpty(validateEvent.getSource().getValue())) {
+                        alert.close();
+                        accountAction.setText("退出");
+                        accountTitle.setText(validateEvent.getSource().getValue().toString());
+                    }
+                });
+            }
+        });
+    }
+
 }

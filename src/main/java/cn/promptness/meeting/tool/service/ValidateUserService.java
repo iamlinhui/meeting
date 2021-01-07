@@ -16,15 +16,15 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Scope("prototype")
-public class ValidateUserService extends Service<Void> {
+public class ValidateUserService extends Service<String> {
 
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
 
     @Override
-    protected Task<Void> createTask() {
-        return new Task<Void>() {
+    protected Task<String> createTask() {
+        return new Task<String>() {
             @Override
-            protected Void call() throws Exception {
+            protected String call() throws Exception {
 
                 URIBuilder builder = new URIBuilder("https://api.oa.fenqile.com/oa/api/user/session.json");
                 HttpGet httpGet = new HttpGet();
@@ -35,9 +35,11 @@ public class ValidateUserService extends Service<Void> {
                     String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
                     JSONObject jsonObject = new JSONObject(content);
                     int code = jsonObject.getInt("retcode");
-                    OpenUtil.open(code);
+                    if (code == 0) {
+                        return jsonObject.getJSONArray("result_rows").getJSONObject(0).getString("name");
+                    }
                 }
-                return null;
+                return "";
             }
         };
     }

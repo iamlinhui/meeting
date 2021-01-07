@@ -2,7 +2,6 @@ package cn.promptness.meeting;
 
 import cn.promptness.meeting.tool.MySystemTray;
 import cn.promptness.meeting.tool.SpringFXMLLoader;
-import com.github.windpapi4j.WinDPAPI;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,7 +26,7 @@ public class MeetingToolApplication extends Application {
 
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");
-        if (!WinDPAPI.isPlatformSupported() || !SystemTray.isSupported()) {
+        if (!SystemTray.isSupported()) {
             System.exit(1);
         }
         Application.launch(MeetingToolApplication.class, args);

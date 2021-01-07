@@ -7,12 +7,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 @Scope("prototype")
@@ -33,11 +29,7 @@ public class CancelMeetingRoomService extends Service<Void> {
                 httpGet.setHeader(OpenUtil.getHeader());
                 httpGet.setURI(builder.build());
 
-                try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(USER_AGENT).build().execute(httpGet)) {
-                    String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                    JSONObject jsonObject = new JSONObject(content);
-                    int code = jsonObject.getInt("retcode");
-                    OpenUtil.open(code);
+                try (CloseableHttpResponse ignored = HttpClients.custom().setUserAgent(USER_AGENT).build().execute(httpGet)) {
                     return null;
                 }
             }

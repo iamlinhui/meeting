@@ -22,6 +22,9 @@
                 <MenuItem text="说明" onAction="#instruction"/>
                 <MenuItem text="关于" onAction="#about"/>
             </Menu>
+            <Menu text="账户" fx:id="accountTitle">
+                <MenuItem text="登录" onAction="#account" fx:id="accountAction"/>
+            </Menu>
         </MenuBar>
     </top>
     <center>
