@@ -14,10 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,7 +35,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -140,13 +135,11 @@ public class MainController {
                 }
                 if (alertStart(meetingTaskProperties)) {
                     startTask(meetingTaskProperties);
-                    MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "开启成功", TrayIcon.MessageType.INFO);
                 }
             });
         } else {
             if (alertStop(meetingTaskProperties)) {
                 stopTask();
-                MySystemTray.getTrayIcon().displayMessage(Constant.TITLE, "暂停成功", TrayIcon.MessageType.INFO);
             }
         }
     }
@@ -286,6 +279,7 @@ public class MainController {
         alert.getButtonTypes().add(ButtonType.CLOSE);
         if (taskFutures.isEmpty()) {
             alert.setContentText("请先开启任务!");
+            alert.showAndWait();
         } else {
             ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
             validateUserService.start();
@@ -299,9 +293,9 @@ public class MainController {
                 }
                 MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
                 alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+                alert.showAndWait();
             });
         }
-        alert.showAndWait();
     }
 
     @FXML
