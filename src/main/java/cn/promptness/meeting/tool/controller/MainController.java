@@ -165,7 +165,7 @@ public class MainController {
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (taskFutures.isEmpty()) {
-            MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
+            MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
             ScheduledFuture<?> schedule = taskScheduler.schedule(new FutureTask<>(meetingTask), new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
             disable(true);
