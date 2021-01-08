@@ -1,6 +1,6 @@
 package cn.promptness.meeting;
 
-import cn.promptness.meeting.tool.MySystemTray;
+import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.SpringFXMLLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -52,6 +52,6 @@ public class MeetingToolApplication extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        MySystemTray.getInstance(primaryStage);
+        SystemTrayUtil.getInstance(primaryStage);
     }
 }

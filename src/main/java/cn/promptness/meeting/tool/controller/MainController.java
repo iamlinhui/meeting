@@ -1,6 +1,6 @@
 package cn.promptness.meeting.tool.controller;
 
-import cn.promptness.meeting.tool.MySystemTray;
+import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
 import cn.promptness.meeting.tool.service.CheckLoginService;
@@ -9,7 +9,7 @@ import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.MdUtil;
-import cn.promptness.meeting.tool.utils.OpenUtil;
+import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledFuture;
 
 @Controller
@@ -127,7 +128,7 @@ public class MainController {
             validateUserService.start();
             validateUserService.setOnSucceeded(event -> {
                 if (StringUtils.isEmpty(event.getSource().getValue())) {
-                    OpenUtil.logout();
+                    MeetingUtil.logout();
                     accountAction.setText("登录");
                     accountTitle.setText("账户");
                     account();
@@ -150,7 +151,7 @@ public class MainController {
         alert.setHeaderText("配置信息");
         alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
 
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
         return Objects.equals(ButtonType.OK, buttonType);
     }
@@ -160,7 +161,7 @@ public class MainController {
         alert.setTitle("暂停会议室助手");
         alert.setHeaderText("确定?");
         alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
         return Objects.equals(ButtonType.OK, buttonType);
     }
@@ -192,7 +193,7 @@ public class MainController {
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (taskFutures.isEmpty()) {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
-            ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
+            ScheduledFuture<?> schedule = taskScheduler.schedule(new FutureTask<>(meetingTask), new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
             disable(true);
         }
@@ -241,7 +242,7 @@ public class MainController {
             Alert alert = new Alert(Alert.AlertType.NONE);
             alert.setTitle(Constant.TITLE);
             alert.setHeaderText("重置配置");
-            alert.initOwner(MySystemTray.getPrimaryStage());
+            alert.initOwner(SystemTrayUtil.getPrimaryStage());
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.setContentText("请先暂停任务!");
             alert.showAndWait();
@@ -254,7 +255,7 @@ public class MainController {
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("关于");
         alert.setContentText("Version " + buildProperties.getVersion() + "\nPowered By Lynn");
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
     }
@@ -265,7 +266,7 @@ public class MainController {
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("使用说明");
         alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
     }
@@ -275,7 +276,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("运行状态");
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         if (taskFutures.isEmpty()) {
             alert.setContentText("请先开启任务!");
@@ -285,7 +286,7 @@ public class MainController {
             validateUserService.start();
             validateUserService.setOnSucceeded(event -> {
                 if (StringUtils.isEmpty(event.getSource().getValue())) {
-                    OpenUtil.logout();
+                    MeetingUtil.logout();
                     accountAction.setText("登录");
                     accountTitle.setText("账户");
                     account();
@@ -311,7 +312,7 @@ public class MainController {
 
         meetingRoomService.setOnSucceeded(event -> {
             if (event.getSource().getValue() == null) {
-                OpenUtil.logout();
+                MeetingUtil.logout();
                 accountAction.setText("登录");
                 accountTitle.setText("账户");
                 account();
@@ -325,7 +326,7 @@ public class MainController {
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle(Constant.TITLE);
             dialog.setHeaderText("成功列表");
-            dialog.initOwner(MySystemTray.getPrimaryStage());
+            dialog.initOwner(SystemTrayUtil.getPrimaryStage());
             dialog.getDialogPane().getButtonTypes().add(cancel);
 
 
@@ -357,7 +358,7 @@ public class MainController {
                     grid.add(new Text(meetingDate), 1, i + 1);
                     grid.add(new Text(jsonObject.getString("start_time")), 2, i + 1);
                     grid.add(new Text(jsonObject.getString("end_time")), 3, i + 1);
-                    grid.add(new Text(OpenUtil.dateToWeek(meetingDate)), 4, i + 1);
+                    grid.add(new Text(MeetingUtil.dateToWeek(meetingDate)), 4, i + 1);
 
                 } catch (JSONException ignored) {
                 }
@@ -379,8 +380,8 @@ public class MainController {
     @FXML
     public void account() {
 
-        if (OpenUtil.haveAccount()) {
-            OpenUtil.logout();
+        if (MeetingUtil.haveAccount()) {
+            MeetingUtil.logout();
             accountAction.setText("登录");
             accountTitle.setText("账户");
             return;
@@ -398,7 +399,7 @@ public class MainController {
         Stage alert = new Stage();
         alert.setTitle(Constant.TITLE);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.initOwner(MySystemTray.getPrimaryStage());
+        alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getIcons().add(new Image("/icon.jpg"));
         alert.setResizable(false);
         alert.setScene(scene);

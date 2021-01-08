@@ -1,9 +1,9 @@
-package cn.promptness.meeting.tool;
+package cn.promptness.meeting.tool.utils;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -14,15 +14,18 @@ import java.awt.event.MouseListener;
 /**
  * 自定义系统托盘(单例模式)
  */
-@Slf4j
-public class MySystemTray {
+public class SystemTrayUtil {
 
-    @Getter
+    private static final Logger log = LoggerFactory.getLogger(SystemTrayUtil.class);
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     private static Stage primaryStage;
-    private static MySystemTray instance;
+    private static SystemTrayUtil instance;
     private static MenuItem showItem;
     private static MenuItem exitItem;
-    @Getter
     private static TrayIcon trayIcon;
     private static ActionListener showListener;
     private static ActionListener exitListener;
@@ -42,7 +45,7 @@ public class MySystemTray {
         exitItem = new MenuItem("退出");
 
         //设置悬停提示信息
-        Image trayIconImage = Toolkit.getDefaultToolkit().getImage(MySystemTray.class.getResource("/icon.jpg"));
+        Image trayIconImage = Toolkit.getDefaultToolkit().getImage(SystemTrayUtil.class.getResource("/icon.jpg"));
         int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
         trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH));
 
@@ -56,14 +59,14 @@ public class MySystemTray {
         };
     }
 
-    public static MySystemTray getInstance(Stage stage) {
+    public static SystemTrayUtil getInstance(Stage stage) {
         if (instance == null) {
-            instance = new MySystemTray(stage);
+            instance = new SystemTrayUtil(stage);
         }
         return instance;
     }
 
-    private MySystemTray(Stage stage) {
+    private SystemTrayUtil(Stage stage) {
         try {
             //检查系统是否支持托盘
             if (!SystemTray.isSupported()) {
@@ -104,7 +107,7 @@ public class MySystemTray {
         exitItem.removeActionListener(exitListener);
         trayIcon.removeMouseListener(mouseListener);
         //行为事件: 点击"打开"按钮,显示窗口
-        showListener = e -> Platform.runLater(() -> MySystemTray.this.showStage(stage));
+        showListener = e -> Platform.runLater(() -> SystemTrayUtil.this.showStage(stage));
         //行为事件: 点击"退出"按钮, 就退出系统
         exitListener = e -> System.exit(0);
         //鼠标行为事件: 单机显示stage

@@ -1,15 +1,14 @@
 package cn.promptness.meeting.tool.task;
 
 import cn.promptness.meeting.tool.data.Constant;
-import lombok.Data;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
-@Data
 public class MeetingTaskProperties {
 
     private Integer plusDays;
@@ -55,5 +54,45 @@ public class MeetingTaskProperties {
             return null;
         }
         return Constant.CRON_LIST.get(cronDescription);
+    }
+
+    public Integer getPlusDays() {
+        return plusDays;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public List<String> getRoomIdList() {
+        return roomIdList;
+    }
+
+    public String getCronDescription() {
+        return cronDescription;
+    }
+
+    public void setPlusDays(Integer plusDays) {
+        this.plusDays = plusDays;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setRoomIdList(List<String> roomIdList) {
+        this.roomIdList = roomIdList;
+    }
+
+    public void setCronDescription(String cronDescription) {
+        this.cronDescription = cronDescription;
     }
 }

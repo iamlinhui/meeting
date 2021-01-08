@@ -1,8 +1,7 @@
 package cn.promptness.meeting.tool.task;
 
-import cn.promptness.meeting.tool.utils.OpenUtil;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.utils.MeetingUtil;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -11,14 +10,19 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Callable;
 
-@Slf4j
-public class MeetingTask implements Runnable {
+public class MeetingTask implements Callable<Boolean> {
+
+    private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
 
     public MeetingTask(MeetingTaskProperties meetingTaskProperties) {
         this.meetingTaskProperties = meetingTaskProperties;
@@ -26,11 +30,8 @@ public class MeetingTask implements Runnable {
 
     private final MeetingTaskProperties meetingTaskProperties;
 
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
-
-    @SneakyThrows
-    public void meeting() {
-        Header header = OpenUtil.getHeader();
+    public Boolean meeting() throws URISyntaxException, IOException, JSONException {
+        Header header = MeetingUtil.getHeader();
         URIBuilder builder = this.getUriBuilder();
         HttpGet httpGet = this.getHttpGet(header);
         log.info("---开始发送请求---");
@@ -38,14 +39,15 @@ public class MeetingTask implements Runnable {
             builder.setParameter("room_id", roomId);
             httpGet.setURI(builder.build());
 
-            try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(USER_AGENT).build().execute(httpGet)) {
+            try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                 String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
                 if (this.isSuccess(content)) {
-                    break;
+                    return true;
                 }
             }
         }
         log.info("---结束发送请求---");
+        return false;
     }
 
     private boolean isSuccess(String content) throws JSONException {
@@ -55,7 +57,7 @@ public class MeetingTask implements Runnable {
             return true;
         }
         log.error(jsonObject.getString("retmsg"));
-        OpenUtil.open(code);
+        MeetingUtil.checkCode(code);
         return false;
     }
 
@@ -75,12 +77,12 @@ public class MeetingTask implements Runnable {
         builder.setParameter("meeting_date", LocalDate.now().plusDays(meetingTaskProperties.getPlusDays()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         builder.setParameter("start_time", meetingTaskProperties.getStartTime());
         builder.setParameter("end_time", meetingTaskProperties.getEndTime());
-        builder.setParameter("meeting_person", OpenUtil.getUid());
+        builder.setParameter("meeting_person", MeetingUtil.getUid());
         return builder;
     }
 
     @Override
-    public void run() {
-        meeting();
+    public Boolean call() throws Exception {
+        return meeting();
     }
 }
