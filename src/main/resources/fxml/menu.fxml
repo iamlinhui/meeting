@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <MenuBar fx:controller="cn.promptness.meeting.tool.controller.MenuController" xmlns="http://javafx.com/javafx/8"
-         xmlns:fx="http://javafx.com/fxml/1">
+         xmlns:fx="http://javafx.com/fxml/1" useSystemMenuBar="true">
     <Menu text="编辑">
         <MenuItem text="重置" onAction="#clear"/>
         <MenuItem text="退出" onAction="#exit"/>
