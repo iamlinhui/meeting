@@ -1,13 +1,16 @@
 package cn.promptness.meeting.tool;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.layout.Pane;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @Component
-public final class SpringFXMLLoader {
+public final class SpringFxmlLoader {
 
     /**
      * 注入Spring上下文对象
@@ -24,6 +27,16 @@ public final class SpringFXMLLoader {
         FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource(resource));
         fxmlLoader.setControllerFactory(applicationContext::getBean);
         return fxmlLoader;
+    }
+
+    public Parent load(String resource) {
+        FXMLLoader fxmlLoader = getLoader(resource);
+        try {
+            return fxmlLoader.load();
+        } catch (IOException ignored) {
+
+        }
+        return new Pane();
     }
 
 }

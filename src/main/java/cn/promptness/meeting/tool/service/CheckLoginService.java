@@ -1,5 +1,6 @@
 package cn.promptness.meeting.tool.service;
 
+import cn.promptness.meeting.tool.controller.LoginController;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.concurrent.Service;
@@ -15,24 +16,26 @@ import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 
 @Component
 @Scope("prototype")
 public class CheckLoginService extends Service<Boolean> {
 
-    private String token;
-    private String time;
-    private Stage alert;
+
+    @Resource
+    private LoginController loginController;
+    private Stage loginStage;
 
     @Override
     protected Task<Boolean> createTask() {
         return new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
-                while (alert.isShowing()) {
+                while (loginStage.isShowing()) {
                     Thread.sleep(3000);
-                    URIBuilder builder = new URIBuilder(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", token, time));
+                    URIBuilder builder = new URIBuilder(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", loginController.getToken(), loginController.getCurrentTimeMillis()));
                     HttpGet httpGet = new HttpGet();
                     httpGet.setHeader(MeetingUtil.getHeader());
                     httpGet.setURI(builder.build());
@@ -52,31 +55,8 @@ public class CheckLoginService extends Service<Boolean> {
         };
     }
 
-
-    public String getToken() {
-        return token;
-    }
-
-    public CheckLoginService setToken(String token) {
-        this.token = token;
-        return this;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public CheckLoginService setTime(String time) {
-        this.time = time;
-        return this;
-    }
-
-    public Stage getAlert() {
-        return alert;
-    }
-
-    public CheckLoginService setAlert(final Stage alert) {
-        this.alert = alert;
+    public CheckLoginService setStage(final Stage loginStage) {
+        this.loginStage = loginStage;
         return this;
     }
 }

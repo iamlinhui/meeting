@@ -1,5 +1,6 @@
 package cn.promptness.meeting.tool.utils;
 
+import cn.promptness.meeting.tool.data.Constant;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class SystemTrayUtil {
             popup.add(exitItem);
             trayIcon.setPopupMenu(popup);
             //鼠标移到系统托盘,会显示提示文本
-            trayIcon.setToolTip("会议室助手");
+            trayIcon.setToolTip(Constant.TITLE);
             listen(stage);
             tray.add(trayIcon);
         } catch (Exception e) {

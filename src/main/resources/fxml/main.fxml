@@ -9,23 +9,7 @@
             minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1">
     <top>
-        <MenuBar>
-            <Menu text="编辑">
-                <MenuItem text="重置" onAction="#clear"/>
-                <MenuItem text="退出" onAction="#exit"/>
-            </Menu>
-            <Menu text="查看">
-                <MenuItem text="状态" onAction="#show"/>
-                <MenuItem text="列表" onAction="#list"/>
-            </Menu>
-            <Menu text="帮助">
-                <MenuItem text="说明" onAction="#instruction"/>
-                <MenuItem text="关于" onAction="#about"/>
-            </Menu>
-            <Menu text="账户" fx:id="accountTitle">
-                <MenuItem text="登录" onAction="#account" fx:id="accountAction"/>
-            </Menu>
-        </MenuBar>
+        <fx:include source="menu.fxml"/>
     </top>
     <center>
         <GridPane hgap="10" vgap="10" fx:id="gridPane">

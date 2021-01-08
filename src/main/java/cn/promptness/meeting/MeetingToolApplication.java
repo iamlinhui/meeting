@@ -1,7 +1,9 @@
 package cn.promptness.meeting;
 
+import cn.promptness.meeting.tool.SpringFxmlLoader;
+import cn.promptness.meeting.tool.controller.MenuController;
+import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
-import cn.promptness.meeting.tool.SpringFXMLLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -41,17 +43,18 @@ public class MeetingToolApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        FXMLLoader fxmlLoader = applicationContext.getBean(SpringFXMLLoader.class).getLoader("/fxml/main.fxml");
+        FXMLLoader fxmlLoader = applicationContext.getBean(SpringFxmlLoader.class).getLoader("/fxml/main.fxml");
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
 
-        primaryStage.setTitle("会议室助手 - Powered By Lynn");
+        primaryStage.setTitle(Constant.TITLE + " - Powered By Lynn");
         primaryStage.getIcons().add(new Image("/icon.jpg"));
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
 
         SystemTrayUtil.getInstance(primaryStage);
+        applicationContext.getBean(MenuController.class).login();
     }
 }

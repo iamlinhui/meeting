@@ -1,7 +1,11 @@
 package cn.promptness.meeting.tool.task;
 
+import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import javafx.application.Platform;
+import javafx.stage.Stage;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -12,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,11 +29,13 @@ public class MeetingTask implements Callable<Boolean> {
 
     private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
 
-    public MeetingTask(MeetingTaskProperties meetingTaskProperties) {
+    public MeetingTask(MeetingTaskProperties meetingTaskProperties, ConfigurableApplicationContext applicationContext) {
         this.meetingTaskProperties = meetingTaskProperties;
+        this.applicationContext = applicationContext;
     }
 
     private final MeetingTaskProperties meetingTaskProperties;
+    private final ConfigurableApplicationContext applicationContext;
 
     public Boolean meeting() throws URISyntaxException, IOException, JSONException {
         Header header = MeetingUtil.getHeader();
@@ -42,6 +49,7 @@ public class MeetingTask implements Callable<Boolean> {
             try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                 String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
                 if (this.isSuccess(content)) {
+                    log.info("---结束发送请求---");
                     return true;
                 }
             }
@@ -57,7 +65,20 @@ public class MeetingTask implements Callable<Boolean> {
             return true;
         }
         log.error(jsonObject.getString("retmsg"));
-        MeetingUtil.checkCode(code);
+        boolean checkCode = MeetingUtil.checkCode(code);
+        if (checkCode) {
+            Stage stage = SystemTrayUtil.getPrimaryStage();
+            Platform.runLater(() -> {
+                if (stage.isIconified()) {
+                    stage.setIconified(false);
+                }
+                if (!stage.isShowing()) {
+                    stage.show();
+                }
+                stage.toFront();
+                applicationContext.getBean(MenuController.class).login();
+            });
+        }
         return false;
     }
 
@@ -83,6 +104,9 @@ public class MeetingTask implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
-        return meeting();
+        if (MeetingUtil.haveAccount()) {
+            return meeting();
+        }
+        return false;
     }
 }
