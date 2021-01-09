@@ -99,10 +99,7 @@ public class MenuController {
             validateUserService.start();
             validateUserService.setOnSucceeded(event -> {
                 if (StringUtils.isEmpty(event.getSource().getValue())) {
-                    MeetingUtil.logout();
-                    accountAction.setText("登录");
-                    accountTitle.setText("账户");
-                    account();
+                    login();
                     return;
                 }
                 MeetingTaskProperties meetingTaskProperties = mainController.buildMeetingTaskProperties();
@@ -195,9 +192,7 @@ public class MenuController {
     public void account() {
 
         if (MeetingUtil.haveAccount()) {
-            MeetingUtil.logout();
-            accountAction.setText("登录");
-            accountTitle.setText("账户");
+            login();
             return;
         }
 

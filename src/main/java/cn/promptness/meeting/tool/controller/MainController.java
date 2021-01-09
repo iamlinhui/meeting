@@ -156,7 +156,7 @@ public class MainController {
 
 
     private void stopTask() {
-        if (!taskFutures.isEmpty()) {
+        if (isRunning()) {
             ScheduledFuture<?> scheduledFuture = taskFutures.poll();
             scheduledFuture.cancel(true);
             disable(false);
@@ -164,7 +164,7 @@ public class MainController {
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
-        if (taskFutures.isEmpty()) {
+        if (!isRunning()) {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
             ScheduledFuture<?> schedule = taskScheduler.schedule(new FutureTask<>(meetingTask), new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);

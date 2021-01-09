@@ -13,9 +13,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MeetingUtil {
 
-
     private static final List<Cookie> HEADER_LIST = new CopyOnWriteArrayList<>();
 
+    /**
+     * Set-Cookie: oa_session=9ldk347t38apb9ksgfs5nalk95; expires=Sun, 10-Jan-2021 08:59:36 GMT; path=/; domain=.oa.fenqile.com; httponly
+     * Set-Cookie: oa_token_id=z0HpnPL%2FgXMwDXuKCd8G8KEG9MAGGCoaKZnctblq7s3TeTQXF3DwbuQQL2CcpQrlwn9ubrj0537SgQ31o7ndCQ%3D%3D; path=/; domain=.oa.fenqile.com
+     * Set-Cookie: mid=31412; path=/; domain=.oa.fenqile.com
+     *
+     * @author lynn
+     * @date 2021/1/9 21:00
+     * @since v1.0.0
+     */
     public static void flashHeader(Header[] headers) {
         HEADER_LIST.clear();
         for (Header header : headers) {
@@ -35,9 +43,6 @@ public class MeetingUtil {
     }
 
     public static String getUid() {
-        //Set-Cookie: oa_session=9ldk347t38apb9ksgfs5nalk95; expires=Sun, 10-Jan-2021 08:59:36 GMT; path=/; domain=.oa.fenqile.com; httponly
-        //Set-Cookie: oa_token_id=z0HpnPL%2FgXMwDXuKCd8G8KEG9MAGGCoaKZnctblq7s3TeTQXF3DwbuQQL2CcpQrlwn9ubrj0537SgQ31o7ndCQ%3D%3D; path=/; domain=.oa.fenqile.com
-        //Set-Cookie: mid=31412; path=/; domain=.oa.fenqile.com
         for (Cookie cookie : HEADER_LIST) {
             if ("mid".equals(cookie.getName())) {
                 return cookie.getValue();
