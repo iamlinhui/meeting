@@ -19,7 +19,7 @@ public class Constant {
         ROOM_INFO_LIST.put("26", "18F 乐信大学");
         ROOM_INFO_LIST.put("59", "18F 洛杉矶·威尔谢大道");
         ROOM_INFO_LIST.put("35", "20F 波士顿·金融中心");
-        ROOM_INFO_LIST.put("78", "20F 慕尼黑•考芬格大街");
+        ROOM_INFO_LIST.put("79", "20F 慕尼黑•考芬格大街");
         ROOM_INFO_LIST.put("80", "20F 曼彻斯特•国王大街");
         ROOM_INFO_LIST.put("81", "20F 圣保罗•保利斯塔大道");
         ROOM_INFO_LIST.put("58", "21F 布鲁塞尔·上城");
