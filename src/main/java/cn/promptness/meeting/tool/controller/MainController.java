@@ -166,7 +166,7 @@ public class MainController {
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (!isRunning()) {
             MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
-            ScheduledFuture<?> schedule = taskScheduler.schedule(new FutureTask<>(meetingTask), new CronTrigger(meetingTaskProperties.getCron()));
+            ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
             disable(true);
         }

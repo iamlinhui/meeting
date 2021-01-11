@@ -18,9 +18,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.Callable;
 
-public class MeetingTask implements Callable<Boolean> {
+public class MeetingTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
 
@@ -82,10 +81,13 @@ public class MeetingTask implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public void run() {
         if (MeetingUtil.haveAccount()) {
-            return meeting();
+            try {
+                meeting();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
         }
-        return false;
     }
 }
