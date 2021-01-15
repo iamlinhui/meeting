@@ -37,6 +37,11 @@ public class Constant {
         ROOM_INFO_LIST.put("19", "26F 北京·金融街");
         ROOM_INFO_LIST.put("47", "26F 卢森堡·皇家大道");
 
+        CRON_LIST.put("每周一1天/次", "0 0 0 ? * 1");
+        CRON_LIST.put("每周二1天/次", "0 0 0 ? * 2");
+        CRON_LIST.put("每周三1天/次", "0 0 0 ? * 3");
+        CRON_LIST.put("每周四1天/次", "0 0 0 ? * 4");
+        CRON_LIST.put("每周五1天/次", "0 0 0 ? * 5");
         CRON_LIST.put("工作日1天/次", "0 0 0 ? * 1-5");
         CRON_LIST.put("工作日3时/次", "0 0 0/3 ? * 1-5");
         CRON_LIST.put("工作日1时/次", "0 0 0/1 ? * 1-5");
