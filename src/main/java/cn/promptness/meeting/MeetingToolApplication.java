@@ -44,10 +44,9 @@ public class MeetingToolApplication extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
-        FXMLLoader fxmlLoader = applicationContext.getBean(SpringFxmlLoader.class).getLoader("/fxml/main.fxml");
-        Parent root = fxmlLoader.load();
+        Parent root = applicationContext.getBean(SpringFxmlLoader.class).load("/fxml/main.fxml");
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
 
