@@ -7,13 +7,28 @@ import java.util.Map;
 
 public class Constant {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
-
     public static final String TITLE = "会议室助手";
+
+    public static final String USER_AGENT;
 
     public static final Map<String, String> ROOM_INFO_LIST = new LinkedHashMap<>();
 
     public static final Map<String, String> CRON_LIST = new LinkedHashMap<>();
+
+    public static final List<String> ITEMS;
+
+    static {
+        String property = System.getProperty("os.name").toLowerCase();
+        if (property.contains("mac")) {
+            USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36";
+        } else if (property.contains("windows 10")) {
+            USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
+        } else if (property.contains("linux")) {
+            USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36";
+        } else {
+            USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36";
+        }
+    }
 
     static {
         ROOM_INFO_LIST.put("26", "18F 乐信大学");
@@ -36,7 +51,9 @@ public class Constant {
         ROOM_INFO_LIST.put("17", "26F 苏黎世·班霍夫大街");
         ROOM_INFO_LIST.put("19", "26F 北京·金融街");
         ROOM_INFO_LIST.put("47", "26F 卢森堡·皇家大道");
+    }
 
+    static {
         CRON_LIST.put("每周一1天/次", "0 0 0 ? * 1");
         CRON_LIST.put("每周二1天/次", "0 0 0 ? * 2");
         CRON_LIST.put("每周三1天/次", "0 0 0 ? * 3");
@@ -52,30 +69,33 @@ public class Constant {
         CRON_LIST.put("工作日10秒/次", "0/10 * * ? * 1-5");
     }
 
-
-    public static final List<String> ITEMS = Arrays.asList("09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-            "17:00",
-            "17:30",
-            "18:00",
-            "18:30",
-            "19:00",
-            "19:30",
-            "20:00",
-            "20:30",
-            "21:00");
+    static {
+        ITEMS = Arrays.asList(
+                "09:00",
+                "09:30",
+                "10:00",
+                "10:30",
+                "11:00",
+                "11:30",
+                "12:00",
+                "12:30",
+                "13:00",
+                "13:30",
+                "14:00",
+                "14:30",
+                "15:00",
+                "15:30",
+                "16:00",
+                "16:30",
+                "17:00",
+                "17:30",
+                "18:00",
+                "18:30",
+                "19:00",
+                "19:30",
+                "20:00",
+                "20:30",
+                "21:00"
+        );
+    }
 }
