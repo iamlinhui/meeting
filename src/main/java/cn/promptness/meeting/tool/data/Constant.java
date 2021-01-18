@@ -9,7 +9,7 @@ public class Constant {
 
     public static final String TITLE = "会议室助手";
 
-    public static final String USER_AGENT;
+    public static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36";
 
     public static final Map<String, String> ROOM_INFO_LIST = new LinkedHashMap<>();
 
@@ -21,12 +21,12 @@ public class Constant {
         String property = System.getProperty("os.name").toLowerCase();
         if (property.contains("mac")) {
             USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36";
-        } else if (property.contains("windows 10")) {
+        }
+        if (property.contains("windows 10")) {
             USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
-        } else if (property.contains("linux")) {
+        }
+        if (property.contains("linux")) {
             USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36";
-        } else {
-            USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36";
         }
     }
 
