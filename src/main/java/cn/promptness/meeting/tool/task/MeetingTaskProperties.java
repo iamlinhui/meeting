@@ -16,13 +16,15 @@ public class MeetingTaskProperties {
     private String endTime;
     private List<String> roomIdList;
     private String cronDescription;
+    private Boolean multipleChoice;
 
-    public MeetingTaskProperties(Integer plusDays, String startTime, String endTime, List<String> roomIdList, String cronDescription) {
+    public MeetingTaskProperties(Integer plusDays, String startTime, String endTime, List<String> roomIdList, String cronDescription, Boolean multipleChoice) {
         this.plusDays = plusDays;
         this.startTime = startTime;
         this.endTime = endTime;
         this.roomIdList = roomIdList;
         this.cronDescription = cronDescription;
+        this.multipleChoice = multipleChoice;
     }
 
     @Override
@@ -30,6 +32,7 @@ public class MeetingTaskProperties {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("偏移天数:\n").append(plusDays).append("\n\n");
         stringBuilder.append("会议时间:\n").append(startTime).append("-").append(endTime).append("\n\n");
+        stringBuilder.append("多选开关:\n").append(Boolean.TRUE.equals(multipleChoice) ? "开" : "关").append("\n\n");
         stringBuilder.append("预定列表:\n");
         for (String roomId : roomIdList) {
             stringBuilder.append(Constant.ROOM_INFO_LIST.get(roomId)).append("\n");
@@ -94,5 +97,13 @@ public class MeetingTaskProperties {
 
     public void setCronDescription(String cronDescription) {
         this.cronDescription = cronDescription;
+    }
+
+    public Boolean getMultipleChoice() {
+        return multipleChoice;
+    }
+
+    public void setMultipleChoice(Boolean multipleChoice) {
+        this.multipleChoice = multipleChoice;
     }
 }

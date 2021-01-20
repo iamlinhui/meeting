@@ -44,6 +44,8 @@ public class MainController {
     private ChoiceBox<String> endTime;
     @FXML
     private ChoiceBox<String> cronDescription;
+    @FXML
+    public RadioButton multipleChoice;
     @Resource
     private MenuController menuController;
 
@@ -100,7 +102,7 @@ public class MainController {
     @FXML
     public void submit() {
         // 确认信息
-        MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
+        MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
         if (isRunning() && alertStop(meetingTaskProperties)) {
             stopTask();
         } else {
@@ -177,6 +179,7 @@ public class MainController {
         startTime.setDisable(disable);
         endTime.setDisable(disable);
         cronDescription.setDisable(disable);
+        multipleChoice.setDisable(disable);
         for (CheckBox checkBox : checkBoxList) {
             checkBox.setDisable(disable);
         }
@@ -205,6 +208,7 @@ public class MainController {
             startTime.setValue(null);
             endTime.setValue(null);
             cronDescription.setValue(null);
+            multipleChoice.setSelected(Boolean.FALSE);
             for (CheckBox checkBox : checkBoxList) {
                 checkBox.setSelected(false);
             }
@@ -221,6 +225,6 @@ public class MainController {
     }
 
     public MeetingTaskProperties buildMeetingTaskProperties() {
-        return new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue());
+        return new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
     }
 }

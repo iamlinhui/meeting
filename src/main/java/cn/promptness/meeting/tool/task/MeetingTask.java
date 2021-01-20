@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class MeetingTask implements Runnable {
 
@@ -37,10 +38,10 @@ public class MeetingTask implements Runnable {
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
             builder.setParameter("room_id", roomId);
             httpGet.setURI(builder.build());
-
+            log.info("---预定会议室{}---", Constant.ROOM_INFO_LIST.get(roomId));
             try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                 String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                if (this.isSuccess(content)) {
+                if (this.isSuccess(content) && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
                     log.info("---结束发送请求---");
                     return true;
                 }

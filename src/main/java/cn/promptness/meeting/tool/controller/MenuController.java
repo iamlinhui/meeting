@@ -81,7 +81,7 @@ public class MenuController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("使用说明");
-        alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序\n3.每次执行中按预约的顺序成功预定一间即结束");
+        alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
