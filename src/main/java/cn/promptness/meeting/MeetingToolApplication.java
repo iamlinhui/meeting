@@ -6,7 +6,6 @@ import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.task.ContinuationTask;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
