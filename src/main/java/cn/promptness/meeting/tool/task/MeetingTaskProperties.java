@@ -115,7 +115,7 @@ public class MeetingTaskProperties {
     }
 
     public Boolean isEnable() {
-        LocalDateTime firstTime = new CronSequenceGenerator(getCron()).next(new Date()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime firstTime = LocalDateTime.now();
         LocalTime localTime = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
         LocalDateTime start = firstTime.plusDays(plusDays).toLocalDate().atTime(localTime);
 
