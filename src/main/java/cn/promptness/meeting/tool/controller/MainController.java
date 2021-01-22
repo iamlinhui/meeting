@@ -22,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledFuture;
 
 @Controller
@@ -103,8 +102,10 @@ public class MainController {
     public void submit() {
         // 确认信息
         MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
-        if (isRunning() && alertStop(meetingTaskProperties)) {
-            stopTask();
+        if (isRunning()) {
+            if (alertStop(meetingTaskProperties)) {
+                stopTask();
+            }
         } else {
             ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
             validateUserService.start();
