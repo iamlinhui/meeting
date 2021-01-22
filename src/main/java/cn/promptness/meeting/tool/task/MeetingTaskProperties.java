@@ -6,9 +6,9 @@ import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,7 +36,8 @@ public class MeetingTaskProperties {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("偏移天数:\n").append(plusDays).append("\n\n");
-        String meetingDate = LocalDate.now().plusDays(plusDays).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime firstTime = new CronSequenceGenerator(getCron()).next(new Date()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        String meetingDate = firstTime.plusDays(plusDays).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         stringBuilder.append("会议时间:\n").append(meetingDate).append("(").append(MeetingUtil.dateToWeek(meetingDate)).append(")").append(startTime).append("-").append(endTime).append("\n\n");
         stringBuilder.append("多选开关:\n").append(Boolean.TRUE.equals(multipleChoice) ? "开" : "关").append("\n\n");
         stringBuilder.append("预定列表:\n");
@@ -114,11 +115,10 @@ public class MeetingTaskProperties {
     }
 
     public Boolean isEnable() {
-        LocalDateTime now = LocalDateTime.now();
-
+        LocalDateTime firstTime = new CronSequenceGenerator(getCron()).next(new Date()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalTime localTime = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
-        LocalDateTime start = LocalDate.now().plusDays(plusDays).atTime(localTime);
+        LocalDateTime start = firstTime.plusDays(plusDays).toLocalDate().atTime(localTime);
 
-        return now.isBefore(start);
+        return firstTime.isBefore(start);
     }
 }
