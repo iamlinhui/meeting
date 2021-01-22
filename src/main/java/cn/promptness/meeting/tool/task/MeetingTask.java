@@ -31,6 +31,9 @@ public class MeetingTask implements Runnable {
     private final MeetingTaskProperties meetingTaskProperties;
 
     public Boolean meeting() throws URISyntaxException, IOException, JSONException {
+        if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
+            return false;
+        }
         Header header = MeetingUtil.getHeader();
         URIBuilder builder = this.getUriBuilder();
         HttpGet httpGet = this.getHttpGet(header);
@@ -38,7 +41,7 @@ public class MeetingTask implements Runnable {
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
             builder.setParameter("room_id", roomId);
             httpGet.setURI(builder.build());
-            log.info("---预定会议室{}---", Constant.ROOM_INFO_LIST.get(roomId));
+            log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
             try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                 String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
                 if (this.isSuccess(content) && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {

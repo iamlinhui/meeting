@@ -1,11 +1,16 @@
 package cn.promptness.meeting.tool.task;
 
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.utils.MeetingUtil;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +36,8 @@ public class MeetingTaskProperties {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("偏移天数:\n").append(plusDays).append("\n\n");
-        stringBuilder.append("会议时间:\n").append(startTime).append("-").append(endTime).append("\n\n");
+        String meetingDate = LocalDate.now().plusDays(plusDays).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        stringBuilder.append("会议时间:\n").append(meetingDate).append("(").append(MeetingUtil.dateToWeek(meetingDate)).append(")").append(startTime).append("-").append(endTime).append("\n\n");
         stringBuilder.append("多选开关:\n").append(Boolean.TRUE.equals(multipleChoice) ? "开" : "关").append("\n\n");
         stringBuilder.append("预定列表:\n");
         for (String roomId : roomIdList) {
@@ -44,7 +50,7 @@ public class MeetingTaskProperties {
     public String mockCron() {
         StringBuilder format = new StringBuilder("即将运行的时间:\n");
         Date now = new Date();
-        for (int i = 0; i < BigDecimal.TEN.intValue(); i++) {
+        for (int i = 0; i < Calendar.DATE; i++) {
             CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(getCron());
             now = cronSequenceGenerator.next(now);
             format.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)).append("\n");
@@ -105,5 +111,14 @@ public class MeetingTaskProperties {
 
     public void setMultipleChoice(Boolean multipleChoice) {
         this.multipleChoice = multipleChoice;
+    }
+
+    public Boolean isEnable() {
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalTime localTime = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
+        LocalDateTime start = LocalDate.now().plusDays(plusDays).atTime(localTime);
+
+        return now.isBefore(start);
     }
 }
