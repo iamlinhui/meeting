@@ -50,7 +50,7 @@ public class MeetingToolApplication extends Application {
         scene.setFill(Color.TRANSPARENT);
 
         primaryStage.setTitle(Constant.TITLE + " - Powered By Lynn");
-        primaryStage.getIcons().add(new Image("/icon.jpg"));
+        primaryStage.getIcons().add(new Image("/icon.png"));
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

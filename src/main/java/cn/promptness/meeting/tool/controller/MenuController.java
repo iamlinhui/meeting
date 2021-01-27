@@ -202,7 +202,7 @@ public class MenuController {
         loginStage.setTitle("MOA扫码登录");
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.initOwner(SystemTrayUtil.getPrimaryStage());
-        loginStage.getIcons().add(new Image("/icon.jpg"));
+        loginStage.getIcons().add(new Image("/icon.png"));
         loginStage.setResizable(false);
         loginStage.setScene(scene);
         loginStage.show();
