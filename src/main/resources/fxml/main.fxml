@@ -17,18 +17,17 @@
                 <Insets top="10" right="50" bottom="20" left="10"/>
             </padding>
             <Label text="偏移天数:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <ChoiceBox fx:id="plusDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="plusDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
             <Label text="会议时间:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-            <ChoiceBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
             <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
-            <ChoiceBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
             <Label text="触发周期:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-            <ChoiceBox fx:id="cronDescription" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <ComboBox fx:id="cronDescription" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
             <Label text="多选开关:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
             <RadioButton fx:id="multipleChoice" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
             <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         </GridPane>
     </center>
     <Button minWidth="80" maxWidth="80" prefWidth="80" mnemonicParsing="false" disable="true" text="开启" fx:id="okButton" onAction="#submit"/>
-
 </BorderPane>

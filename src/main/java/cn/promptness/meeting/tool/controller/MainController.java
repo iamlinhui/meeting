@@ -5,6 +5,7 @@ import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -36,13 +37,13 @@ public class MainController {
     @FXML
     public GridPane gridPane;
     @FXML
-    private ChoiceBox<Integer> plusDays;
+    private ComboBox<Integer> plusDays;
     @FXML
-    private ChoiceBox<String> startTime;
+    private ComboBox<String> startTime;
     @FXML
-    private ChoiceBox<String> endTime;
+    private ComboBox<String> endTime;
     @FXML
-    private ChoiceBox<String> cronDescription;
+    private ComboBox<String> cronDescription;
     @FXML
     public RadioButton multipleChoice;
     @Resource
@@ -90,6 +91,9 @@ public class MainController {
                     roomIdList.add(checkBox.getId());
                 }
                 flag[3] = !CollectionUtils.isEmpty(roomIdList);
+                if (!flag[3]) {
+                    TooltipUtil.show("至少选择一个!");
+                }
                 checkSubmit();
             });
             checkBoxList.add(checkBox);
@@ -151,6 +155,9 @@ public class MainController {
                 Date parseStartTime = simpleDateFormat.parse(startTime.getValue());
                 Date parseEndTime = simpleDateFormat.parse(endTime.getValue());
                 flag[1] = parseStartTime.before(parseEndTime);
+                if (!flag[1]) {
+                    TooltipUtil.show("时间范围不正确!");
+                }
             }
         } catch (ParseException e) {
             flag[1] = false;
@@ -163,6 +170,7 @@ public class MainController {
             ScheduledFuture<?> scheduledFuture = taskFutures.poll();
             scheduledFuture.cancel(true);
             disable(false);
+            TooltipUtil.show("暂停成功!");
         }
     }
 
@@ -172,6 +180,7 @@ public class MainController {
             ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
             disable(true);
+            TooltipUtil.show("开启成功!");
         }
     }
 

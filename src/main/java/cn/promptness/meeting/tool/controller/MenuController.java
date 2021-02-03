@@ -9,8 +9,10 @@ import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -196,6 +198,11 @@ public class MenuController {
             return;
         }
 
+        Stage primaryStage = SystemTrayUtil.getPrimaryStage();
+        Parent root = primaryStage.getScene().getRoot();
+        double x = TooltipUtil.getScreenX(root) + TooltipUtil.getWidth(root) / 3;
+        double y = TooltipUtil.getScreenY(root) + TooltipUtil.getHeight(root) / 4;
+
         Scene scene = new Scene(springFxmlLoader.load("/fxml/login.fxml"));
 
         Stage loginStage = new Stage();
@@ -205,6 +212,8 @@ public class MenuController {
         loginStage.getIcons().add(new Image("/icon.png"));
         loginStage.setResizable(false);
         loginStage.setScene(scene);
+        loginStage.setX(x);
+        loginStage.setY(y);
         loginStage.show();
 
         CheckLoginService checkLoginService = applicationContext.getBean(CheckLoginService.class).setStage(loginStage);
