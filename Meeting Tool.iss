@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=D:\
-OutputBaseFilename=Meeting Tool Setup
+OutputBaseFilename=Meeting Tool Setup {#MyAppVersion}
 SetupIconFile={#MySourcePath}\Meeting Tool.ico
 UninstallDisplayIcon={app}\Meeting Tool.ico
 Compression=lzma
