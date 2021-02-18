@@ -4,6 +4,7 @@ import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.task.ContinuationTask;
+import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.Banner;
@@ -24,7 +26,7 @@ import java.awt.*;
 
 @SpringBootApplication
 @EnableScheduling
-public class MeetingToolApplication extends Application {
+public class MeetingToolApplication extends Application implements DisposableBean {
 
     private ConfigurableApplicationContext applicationContext;
 
@@ -55,11 +57,16 @@ public class MeetingToolApplication extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
         SystemTrayUtil.getInstance(primaryStage);
-        applicationContext.getBean(MenuController.class).login();
+        applicationContext.getBean(MenuController.class).initAccount();
 
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ContinuationTask.class);
         DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
         defaultListableBeanFactory.registerBeanDefinition(ContinuationTask.class.getName(), beanDefinitionBuilder.getBeanDefinition());
         applicationContext.getBean(ContinuationTask.class);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        MeetingUtil.cache();
     }
 }

@@ -1,6 +1,11 @@
 package cn.promptness.meeting.tool.data;
 
-public class Cookie {
+import java.io.Serializable;
+
+public class Cookie implements Serializable {
+
+    private static final long serialVersionUID = 1890985422262564489L;
+
     protected String name;
     protected String value;
 

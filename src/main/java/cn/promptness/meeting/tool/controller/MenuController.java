@@ -241,4 +241,18 @@ public class MenuController {
         account();
     }
 
+    public void initAccount() {
+        MeetingUtil.readCache();
+        ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
+        validateUserService.start();
+        validateUserService.setOnSucceeded(event -> {
+            if (StringUtils.isEmpty(event.getSource().getValue())) {
+                login();
+            } else {
+                accountAction.setText("注销");
+                accountTitle.setText(event.getSource().getValue().toString());
+            }
+        });
+    }
+
 }
