@@ -12,21 +12,22 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
 
 @SpringBootApplication
 @EnableScheduling
-public class MeetingToolApplication extends Application implements DisposableBean {
+public class MeetingToolApplication extends Application implements ApplicationListener<ContextClosedEvent> {
 
     private ConfigurableApplicationContext applicationContext;
 
@@ -66,7 +67,7 @@ public class MeetingToolApplication extends Application implements DisposableBea
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void onApplicationEvent(ContextClosedEvent event) {
         MeetingUtil.cache();
     }
 }
