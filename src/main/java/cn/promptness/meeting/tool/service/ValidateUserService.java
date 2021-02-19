@@ -24,7 +24,9 @@ public class ValidateUserService extends Service<String> {
         return new Task<String>() {
             @Override
             protected String call() throws Exception {
-
+                if (!MeetingUtil.haveAccount()) {
+                    return "";
+                }
                 URIBuilder builder = new URIBuilder("https://api.oa.fenqile.com/oa/api/user/session.json");
                 HttpGet httpGet = new HttpGet();
                 httpGet.setHeader(MeetingUtil.getHeader());
