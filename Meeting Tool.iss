@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Meeting Tool"
-#define MyAppVersion "2.0.2"
+#define MyAppVersion "2.0.2.1"
 #define MyAppPublisher "Lynn"
 #define MyAppURL "https://www.lexin.com/"
 #define MyAppExeName "Meeting Tool.exe"
