@@ -18,7 +18,10 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MeetingTask implements Runnable {
 
@@ -37,21 +40,63 @@ public class MeetingTask implements Runnable {
         Header header = MeetingUtil.getHeader();
         URIBuilder builder = this.getUriBuilder();
         HttpGet httpGet = this.getHttpGet(header);
+        List<String> roomIdList = meetingTaskProperties.getRoomIdList();
         log.info("---开始发送请求---");
-        for (String roomId : meetingTaskProperties.getRoomIdList()) {
-            builder.setParameter("room_id", roomId);
-            httpGet.setURI(builder.build());
-            log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
-            try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
-                String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                if (this.isSuccess(content) && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
+        while (true) {
+            // 0默认 1成功  2时间未到  3已经被占有了
+            int[] result = new int[roomIdList.size()];
+            for (int i = 0; i < roomIdList.size(); i++) {
+                String roomId = roomIdList.get(i);
+                builder.setParameter("room_id", roomId);
+                httpGet.setURI(builder.build());
+                log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
+                try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
+                    String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
+                    result[i] = this.checkContent(content);
+                    if (result[i] == 1 && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
+                        log.info("---结束发送请求---");
+                        return true;
+                    }
+                }
+            }
+
+            List<Integer> resultList = Arrays.stream(result).boxed().collect(Collectors.toList());
+
+            // 非多选
+            if (!Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
+                if (Arrays.stream(result).sum() == roomIdList.size() * 3) {
                     log.info("---结束发送请求---");
-                    return true;
+                    return false;
+                }
+            }
+            // 多选
+            else {
+                if (!resultList.contains(2)) {
+                    log.info("---结束发送请求---");
+                    return false;
                 }
             }
         }
-        log.info("---结束发送请求---");
-        return false;
+    }
+
+    private int checkContent(String content) throws JSONException {
+        // 0默认 1成功  2时间未到  3已经被占有了
+        JSONObject jsonObject = new JSONObject(content);
+        int code = jsonObject.getInt("retcode");
+        if (code == 0) {
+            return 1;
+        }
+        String retmsg = jsonObject.getString("retmsg");
+        log.error(retmsg);
+        final String future = "只能预定未来7天内的会议室";
+        if (retmsg.contains(future)) {
+            return 2;
+        }
+        final String conflict = "预定的会议室冲突";
+        if (retmsg.contains(conflict)) {
+            return 3;
+        }
+        return 0;
     }
 
     private boolean isSuccess(String content) throws JSONException {
