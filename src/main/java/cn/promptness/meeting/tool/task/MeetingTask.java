@@ -88,15 +88,15 @@ public class MeetingTask implements Runnable {
         }
         String retmsg = jsonObject.getString("retmsg");
         log.error(retmsg);
-        final String future = "只能预定未来7天内的会议室";
-        if (retmsg.contains(future)) {
-            return 2;
-        }
         final String conflict = "预定的会议室冲突";
         if (retmsg.contains(conflict)) {
             return 3;
         }
-        return 0;
+        final String future = "只能预定未来7天内的会议室";
+        if (retmsg.contains(future)) {
+            return 2;
+        }
+        return 3;
     }
 
     private boolean isSuccess(String content) throws JSONException {
