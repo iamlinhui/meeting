@@ -1,4 +1,4 @@
-package cn.promptness.meeting.tool.task;
+package cn.promptness.meeting.tool.config;
 
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;

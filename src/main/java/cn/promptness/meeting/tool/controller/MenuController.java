@@ -6,7 +6,7 @@ import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
-import cn.promptness.meeting.tool.task.MeetingTaskProperties;
+import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;

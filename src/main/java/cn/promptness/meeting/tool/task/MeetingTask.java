@@ -1,62 +1,54 @@
 package cn.promptness.meeting.tool.task;
 
+import cn.promptness.httpclient.HttpClientUtil;
+import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MeetingTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
 
-    public MeetingTask(MeetingTaskProperties meetingTaskProperties) {
+    public MeetingTask(MeetingTaskProperties meetingTaskProperties, HttpClientUtil httpClientUtil) {
         this.meetingTaskProperties = meetingTaskProperties;
+        this.httpClientUtil = httpClientUtil;
     }
 
     private final MeetingTaskProperties meetingTaskProperties;
+    private final HttpClientUtil httpClientUtil;
 
-    public Boolean meeting() throws URISyntaxException, IOException {
+    public Boolean meeting() throws Exception {
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
             return false;
         }
-        Header header = MeetingUtil.getHeader();
-        URIBuilder builder = this.getUriBuilder();
-        HttpGet httpGet = this.getHttpGet(header);
+
+        Map<String, String> paramMap = this.getParamMap();
+
         List<String> roomIdList = meetingTaskProperties.getRoomIdList();
         log.info("---开始发送请求---");
         while (true) {
+            final String end = "---结束发送请求---";
             // 0默认 1成功  2时间未到  3已经被占有了
             int[] result = new int[roomIdList.size()];
             for (int i = 0; i < roomIdList.size(); i++) {
                 String roomId = roomIdList.get(i);
-                builder.setParameter("room_id", roomId);
-                httpGet.setURI(builder.build());
+                paramMap.put("room_id", roomId);
                 log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
-                try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
-                    String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                    result[i] = this.checkContent(content);
-                    if (result[i] == 1 && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
-                        log.info("---结束发送请求---");
-                        return true;
-                    }
+                HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, MeetingUtil.getHeaderList());
+                result[i] = this.checkContent(httpResult.getMessage());
+                if (result[i] == 1 && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
+                    log.info(end);
+                    return true;
                 }
             }
 
@@ -65,14 +57,14 @@ public class MeetingTask implements Runnable {
             // 非多选
             if (!Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
                 if (Arrays.stream(result).sum() == roomIdList.size() * 3) {
-                    log.info("---结束发送请求---");
+                    log.info(end);
                     return false;
                 }
             }
             // 多选
             else {
                 if (!resultList.contains(2)) {
-                    log.info("---结束发送请求---");
+                    log.info(end);
                     return false;
                 }
             }
@@ -99,34 +91,17 @@ public class MeetingTask implements Runnable {
         return 3;
     }
 
-    private boolean isSuccess(String content) {
-        JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
-        int code = jsonObject.get("retcode").getAsInt();
-        if (code == 0) {
-            return true;
-        }
-        log.error(jsonObject.get("retmsg").getAsString());
-        return false;
-    }
-
-
-    private HttpGet getHttpGet(Header header) {
-        HttpGet httpGet = new HttpGet();
-        httpGet.setHeader(header);
-        return httpGet;
-    }
-
-    private URIBuilder getUriBuilder() throws URISyntaxException {
-        URIBuilder builder = new URIBuilder("https://m.oa.fenqile.com/meeting/main/due_meeting.json");
-        builder.setParameter("meeting_type_id", "1");
-        builder.setParameter("meeting_name", "工作汇报");
-        builder.setParameter("city", "深圳市");
-        builder.setParameter("address", "中国储能大厦");
-        builder.setParameter("meeting_date", LocalDate.now().plusDays(meetingTaskProperties.getPlusDays()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        builder.setParameter("start_time", meetingTaskProperties.getStartTime());
-        builder.setParameter("end_time", meetingTaskProperties.getEndTime());
-        builder.setParameter("meeting_person", MeetingUtil.getUid());
-        return builder;
+    private Map<String, String> getParamMap() {
+        Map<String, String> paramMap = new HashMap<>(16);
+        paramMap.put("meeting_type_id", "1");
+        paramMap.put("meeting_name", "工作汇报");
+        paramMap.put("city", "深圳市");
+        paramMap.put("address", "中国储能大厦");
+        paramMap.put("meeting_date", LocalDate.now().plusDays(meetingTaskProperties.getPlusDays()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        paramMap.put("start_time", meetingTaskProperties.getStartTime());
+        paramMap.put("end_time", meetingTaskProperties.getEndTime());
+        paramMap.put("meeting_person", MeetingUtil.getUid());
+        return paramMap;
     }
 
     @Override

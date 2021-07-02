@@ -1,9 +1,10 @@
 package cn.promptness.meeting.tool.controller;
 
+import cn.promptness.httpclient.HttpClientUtil;
+import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
-import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.collections.FXCollections;
@@ -48,6 +49,8 @@ public class MainController {
     public RadioButton multipleChoice;
     @Resource
     private MenuController menuController;
+    @Resource
+    private HttpClientUtil httpClientUtil;
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
     private final ArrayList<String> roomIdList = new ArrayList<>();
@@ -176,7 +179,7 @@ public class MainController {
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (!isRunning()) {
-            MeetingTask meetingTask = new MeetingTask(meetingTaskProperties);
+            MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, httpClientUtil);
             ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
             taskFutures.add(schedule);
             disable(true);

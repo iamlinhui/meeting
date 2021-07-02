@@ -3,7 +3,6 @@ package cn.promptness.meeting.tool.utils;
 import org.apache.http.Header;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie2;
-import org.apache.http.message.BasicHeader;
 import org.springframework.util.CollectionUtils;
 
 import java.io.*;
@@ -91,14 +90,6 @@ public class MeetingUtil {
 
     public static List<Cookie> getHeaderList() {
         return HEADER_LIST;
-    }
-
-    public static Header getHeader() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Cookie cookie : HEADER_LIST) {
-            stringBuilder.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-        }
-        return new BasicHeader("Cookie", stringBuilder.toString());
     }
 
     public static boolean checkCode(int code) {
