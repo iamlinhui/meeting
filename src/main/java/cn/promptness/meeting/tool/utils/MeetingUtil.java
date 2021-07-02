@@ -1,7 +1,8 @@
 package cn.promptness.meeting.tool.utils;
 
-import cn.promptness.meeting.tool.data.Cookie;
 import org.apache.http.Header;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookie2;
 import org.apache.http.message.BasicHeader;
 import org.springframework.util.CollectionUtils;
 
@@ -61,12 +62,12 @@ public class MeetingUtil {
      * @date 2021/1/9 21:00
      * @since v1.0.0
      */
-    public static void flashHeader(Header[] headers) {
+    public static void flashHeader(List<Header> headers) {
         HEADER_LIST.clear();
         for (Header header : headers) {
             String value = header.getValue();
             String cookieString = value.split(";")[0];
-            Cookie cookie = new Cookie(cookieString.split("=")[0], cookieString.split("=")[1]);
+            Cookie cookie = new BasicClientCookie2(cookieString.split("=")[0], cookieString.split("=")[1]);
             HEADER_LIST.add(cookie);
         }
     }
@@ -86,6 +87,10 @@ public class MeetingUtil {
             }
         }
         return "";
+    }
+
+    public static List<Cookie> getHeaderList() {
+        return HEADER_LIST;
     }
 
     public static Header getHeader() {
