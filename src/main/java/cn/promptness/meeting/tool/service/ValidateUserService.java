@@ -2,6 +2,8 @@ package cn.promptness.meeting.tool.service;
 
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -9,7 +11,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -34,10 +35,10 @@ public class ValidateUserService extends Service<String> {
 
                 try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                     String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                    JSONObject jsonObject = new JSONObject(content);
-                    int code = jsonObject.getInt("retcode");
+                    JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
+                    int code = jsonObject.get("retcode").getAsInt();
                     if (code == 0) {
-                        return jsonObject.getJSONArray("result_rows").getJSONObject(0).getString("name");
+                        return jsonObject.getAsJsonArray("result_rows").get(0).getAsJsonObject().get("name").getAsString();
                     }
                 }
                 return "";

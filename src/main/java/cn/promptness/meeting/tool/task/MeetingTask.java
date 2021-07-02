@@ -2,14 +2,14 @@ package cn.promptness.meeting.tool.task;
 
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class MeetingTask implements Runnable {
 
     private final MeetingTaskProperties meetingTaskProperties;
 
-    public Boolean meeting() throws URISyntaxException, IOException, JSONException {
+    public Boolean meeting() throws URISyntaxException, IOException {
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
             return false;
         }
@@ -79,14 +79,14 @@ public class MeetingTask implements Runnable {
         }
     }
 
-    private int checkContent(String content) throws JSONException {
+    private int checkContent(String content) {
         // 0默认 1成功  2时间未到  3已经被占有了
-        JSONObject jsonObject = new JSONObject(content);
-        int code = jsonObject.getInt("retcode");
+        JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
+        int code = jsonObject.get("retcode").getAsInt();
         if (code == 0) {
             return 1;
         }
-        String retmsg = jsonObject.getString("retmsg");
+        String retmsg = jsonObject.get("retmsg").getAsString();
         log.error(retmsg);
         final String conflict = "预定的会议室冲突";
         if (retmsg.contains(conflict)) {
@@ -99,13 +99,13 @@ public class MeetingTask implements Runnable {
         return 3;
     }
 
-    private boolean isSuccess(String content) throws JSONException {
-        JSONObject jsonObject = new JSONObject(content);
-        int code = jsonObject.getInt("retcode");
+    private boolean isSuccess(String content) {
+        JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
+        int code = jsonObject.get("retcode").getAsInt();
         if (code == 0) {
             return true;
         }
-        log.error(jsonObject.getString("retmsg"));
+        log.error(jsonObject.get("retmsg").getAsString());
         return false;
     }
 

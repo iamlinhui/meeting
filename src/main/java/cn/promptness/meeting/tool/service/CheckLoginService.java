@@ -3,6 +3,8 @@ package cn.promptness.meeting.tool.service;
 import cn.promptness.meeting.tool.controller.LoginController;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
@@ -12,7 +14,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +42,9 @@ public class CheckLoginService extends Service<Boolean> {
                     httpGet.setURI(builder.build());
                     try (CloseableHttpResponse closeableHttpResponse = HttpClients.custom().setUserAgent(Constant.USER_AGENT).build().execute(httpGet)) {
                         String content = EntityUtils.toString(closeableHttpResponse.getEntity(), StandardCharsets.UTF_8);
-                        JSONObject jsonObject = new JSONObject(content);
-                        int loginSuccess = jsonObject.getInt("login_success");
+
+                        JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
+                        int loginSuccess = jsonObject.get("login_success").getAsInt();
                         if (loginSuccess == 1) {
                             Header[] headers = closeableHttpResponse.getHeaders("Set-Cookie");
                             MeetingUtil.flashHeader(headers);

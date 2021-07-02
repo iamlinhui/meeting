@@ -10,6 +10,8 @@ import cn.promptness.meeting.tool.task.MeetingTaskProperties;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -20,9 +22,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -130,7 +129,7 @@ public class MenuController {
                 login();
                 return;
             }
-            JSONArray value = (JSONArray) event.getSource().getValue();
+            JsonArray value = (JsonArray) event.getSource().getValue();
 
             ArrayList<String> cancelList = new ArrayList<>();
             ButtonType cancel = new ButtonType("取消会议室");
@@ -151,11 +150,11 @@ public class MenuController {
             grid.add(new Text("开始时间"), 2, 0);
             grid.add(new Text("结束时间"), 3, 0);
             grid.add(new Text("星期"), 4, 0);
-            for (int i = 0; i < value.length(); i++) {
+            for (int i = 0; i < value.size(); i++) {
 
                 try {
-                    JSONObject jsonObject = value.getJSONObject(i);
-                    CheckBox checkBox = new CheckBox(jsonObject.get("floor") + "F" + jsonObject.getString("room_name"));
+                    JsonObject jsonObject = value.get(i).getAsJsonObject();
+                    CheckBox checkBox = new CheckBox(jsonObject.get("floor") + "F" + jsonObject.get("room_name").getAsString());
                     checkBox.setId(jsonObject.get("meeting_id").toString());
 
                     checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -166,13 +165,13 @@ public class MenuController {
                     });
 
                     grid.add(checkBox, 0, i + 1);
-                    String meetingDate = jsonObject.getString("meeting_date");
+                    String meetingDate = jsonObject.get("meeting_date").getAsString();
                     grid.add(new Text(meetingDate), 1, i + 1);
-                    grid.add(new Text(jsonObject.getString("start_time")), 2, i + 1);
-                    grid.add(new Text(jsonObject.getString("end_time")), 3, i + 1);
+                    grid.add(new Text(jsonObject.get("start_time").getAsString()), 2, i + 1);
+                    grid.add(new Text(jsonObject.get("end_time").getAsString()), 3, i + 1);
                     grid.add(new Text(MeetingUtil.dateToWeek(meetingDate)), 4, i + 1);
 
-                } catch (JSONException ignored) {
+                } catch (Exception ignored) {
                 }
 
                 dialog.getDialogPane().setContent(grid);
