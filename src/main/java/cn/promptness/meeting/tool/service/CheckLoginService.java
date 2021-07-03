@@ -30,7 +30,7 @@ public class CheckLoginService extends Service<Boolean> {
         return new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
-                while (loginStage.isShowing()) {
+                while (loginStage.isShowing() && loginController.isCodeSuccess()) {
                     Thread.sleep(3000);
                     HttpResult httpResult = httpClientUtil.doGet(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", loginController.getToken(), loginController.getCurrentTimeMillis()), MeetingUtil.getHeaderList());
                     JsonObject jsonObject = httpResult.getContent(JsonObject.class);
