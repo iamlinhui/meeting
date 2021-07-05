@@ -49,23 +49,31 @@ public class SystemTrayUtil {
         //鼠标移到系统托盘,会显示提示文本
         trayIcon.setToolTip(toolTip);
 
-        //给菜单项添加事件
-        showItem.addActionListener(e -> Platform.runLater(() -> {
-            if (stage.isIconified()) {
-                stage.setIconified(false);
-            }
-            if (!stage.isShowing()) {
-                stage.show();
-            }
-            stage.toFront();
-        }));
-        exitItem.addActionListener(e -> System.exit(0));
+        addShowListener(showItem);
+        addExitListener(exitItem);
         addMouseListener(trayIcon);
         try {
             tray.add(trayIcon);
         } catch (Exception e) {
             log.info(e.getMessage());
         }
+    }
+
+    private static void addExitListener(MenuItem exitItem) {
+        exitItem.addActionListener(e -> System.exit(0));
+    }
+
+    private static void addShowListener(MenuItem showItem) {
+        //给菜单项添加事件
+        showItem.addActionListener(e -> Platform.runLater(() -> {
+            if (primaryStage.isIconified()) {
+                primaryStage.setIconified(false);
+            }
+            if (!primaryStage.isShowing()) {
+                primaryStage.show();
+            }
+            primaryStage.toFront();
+        }));
     }
 
     private static void addMouseListener(TrayIcon trayIcon) {
