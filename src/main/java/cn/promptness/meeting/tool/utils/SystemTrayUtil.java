@@ -62,6 +62,15 @@ public class SystemTrayUtil {
             });
         });
         exitItem.addActionListener(e -> System.exit(0));
+        addMouseListener(trayIcon);
+        try {
+            tray.add(trayIcon);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    private static void addMouseListener(TrayIcon trayIcon) {
         //给系统托盘添加鼠标响应事件
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
@@ -70,21 +79,16 @@ public class SystemTrayUtil {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     //点击系统托盘,
                     Platform.runLater(() -> {
-                        if (stage.isIconified()) {
-                            stage.setIconified(false);
+                        if (primaryStage.isIconified()) {
+                            primaryStage.setIconified(false);
                         }
-                        if (!stage.isShowing()) {
-                            stage.show();
+                        if (!primaryStage.isShowing()) {
+                            primaryStage.show();
                         }
-                        stage.toFront();
+                        primaryStage.toFront();
                     });
                 }
             }
         });
-        try {
-            tray.add(trayIcon);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-        }
     }
 }
