@@ -57,7 +57,7 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-        SystemTrayUtil.getInstance(primaryStage);
+        SystemTrayUtil.systemTray(primaryStage, Constant.TITLE);
         applicationContext.getBean(MenuController.class).initAccount();
 
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ContinuationTask.class);

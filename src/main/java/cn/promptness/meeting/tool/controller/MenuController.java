@@ -3,6 +3,7 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
@@ -10,8 +11,6 @@ import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -29,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -129,7 +129,7 @@ public class MenuController {
                 login();
                 return;
             }
-            JsonArray value = (JsonArray) event.getSource().getValue();
+            List<Room> roomList = (List<Room>) event.getSource().getValue();
 
             ArrayList<String> cancelList = new ArrayList<>();
             ButtonType cancel = new ButtonType("取消会议室");
@@ -150,29 +150,23 @@ public class MenuController {
             grid.add(new Text("开始时间"), 2, 0);
             grid.add(new Text("结束时间"), 3, 0);
             grid.add(new Text("星期"), 4, 0);
-            for (int i = 0; i < value.size(); i++) {
+            for (int i = 0; i < roomList.size(); i++) {
+                Room room = roomList.get(i);
+                CheckBox checkBox = new CheckBox(room.getFloor() + "F" + room.getRoomName());
+                checkBox.setId(room.getMeetingId().toString());
 
-                try {
-                    JsonObject jsonObject = value.get(i).getAsJsonObject();
-                    CheckBox checkBox = new CheckBox(jsonObject.get("floor") + "F" + jsonObject.get("room_name").getAsString());
-                    checkBox.setId(jsonObject.get("meeting_id").toString());
+                checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    cancelList.remove(checkBox.getId());
+                    if (checkBox.isSelected()) {
+                        cancelList.add(checkBox.getId());
+                    }
+                });
 
-                    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                        cancelList.remove(checkBox.getId());
-                        if (checkBox.isSelected()) {
-                            cancelList.add(checkBox.getId());
-                        }
-                    });
-
-                    grid.add(checkBox, 0, i + 1);
-                    String meetingDate = jsonObject.get("meeting_date").getAsString();
-                    grid.add(new Text(meetingDate), 1, i + 1);
-                    grid.add(new Text(jsonObject.get("start_time").getAsString()), 2, i + 1);
-                    grid.add(new Text(jsonObject.get("end_time").getAsString()), 3, i + 1);
-                    grid.add(new Text(MeetingUtil.dateToWeek(meetingDate)), 4, i + 1);
-
-                } catch (Exception ignored) {
-                }
+                grid.add(checkBox, 0, i + 1);
+                grid.add(new Text(room.getMeetingDate()), 1, i + 1);
+                grid.add(new Text(room.getStartTime()), 2, i + 1);
+                grid.add(new Text(room.getEndTime()), 3, i + 1);
+                grid.add(new Text(MeetingUtil.dateToWeek(room.getMeetingDate())), 4, i + 1);
 
                 dialog.getDialogPane().setContent(grid);
             }
