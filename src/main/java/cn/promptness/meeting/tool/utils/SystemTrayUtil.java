@@ -50,17 +50,15 @@ public class SystemTrayUtil {
         trayIcon.setToolTip(toolTip);
 
         //给菜单项添加事件
-        showItem.addActionListener(e -> {
-            Platform.runLater(() -> {
-                if (stage.isIconified()) {
-                    stage.setIconified(false);
-                }
-                if (!stage.isShowing()) {
-                    stage.show();
-                }
-                stage.toFront();
-            });
-        });
+        showItem.addActionListener(e -> Platform.runLater(() -> {
+            if (stage.isIconified()) {
+                stage.setIconified(false);
+            }
+            if (!stage.isShowing()) {
+                stage.show();
+            }
+            stage.toFront();
+        }));
         exitItem.addActionListener(e -> System.exit(0));
         addMouseListener(trayIcon);
         try {
