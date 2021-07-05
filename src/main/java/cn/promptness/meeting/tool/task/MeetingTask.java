@@ -4,9 +4,8 @@ import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class MeetingTask implements Runnable {
                 paramMap.put("room_id", roomId);
                 log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
                 HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, MeetingUtil.getHeaderList());
-                result[i] = this.checkContent(httpResult.getMessage());
+                result[i] = this.checkContent(httpResult);
                 if (result[i] == 1 && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {
                     log.info(end);
                     return true;
@@ -71,21 +70,20 @@ public class MeetingTask implements Runnable {
         }
     }
 
-    private int checkContent(String content) {
+    private int checkContent(HttpResult httpResult) {
         // 0默认 1成功  2时间未到  3已经被占有了
-        JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
-        int code = jsonObject.get("retcode").getAsInt();
-        if (code == 0) {
+        Response<?> response = httpResult.getContent(Response.class);
+        if (response.getCode() == 0) {
             return 1;
         }
-        String retmsg = jsonObject.get("retmsg").getAsString();
-        log.error(retmsg);
+        String message = response.getMessage();
+        log.error(message);
         final String conflict = "预定的会议室冲突";
-        if (retmsg.contains(conflict)) {
+        if (message.contains(conflict)) {
             return 3;
         }
         final String future = "只能预定未来7天内的会议室";
-        if (retmsg.contains(future)) {
+        if (message.contains(future)) {
             return 2;
         }
         return 3;
