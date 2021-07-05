@@ -3,8 +3,8 @@ package cn.promptness.meeting.tool.service;
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
 import cn.promptness.meeting.tool.controller.LoginController;
+import cn.promptness.meeting.tool.pojo.Login;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
-import com.google.gson.JsonObject;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
@@ -33,9 +33,8 @@ public class CheckLoginService extends Service<Boolean> {
                 while (loginStage.isShowing() && loginController.isCodeSuccess()) {
                     Thread.sleep(3000);
                     HttpResult httpResult = httpClientUtil.doGet(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", loginController.getToken(), loginController.getCurrentTimeMillis()), MeetingUtil.getHeaderList());
-                    JsonObject jsonObject = httpResult.getContent(JsonObject.class);
-                    int loginSuccess = jsonObject.get("login_success").getAsInt();
-                    if (loginSuccess == 1) {
+                    Login login = httpResult.getContent(Login.class);
+                    if (login.isSuccess()) {
                         List<Header> headerList = httpResult.getHeaderList("Set-Cookie");
                         MeetingUtil.flashHeader(headerList);
                         return Boolean.TRUE;
