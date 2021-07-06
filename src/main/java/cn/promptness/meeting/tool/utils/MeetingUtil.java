@@ -7,14 +7,27 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MeetingUtil {
 
-    private static final List<Cookie> HEADER_LIST = new CopyOnWriteArrayList<>();
+    public static void main(String[] args) {
+        File account = new File("account.dat");
+        if (account.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(account))) {
+                Object object;
+                while ((object = ois.readObject()) != null) {
+                    Cookie cookie = (Cookie) object;
+                    HEADER_MAP.put(cookie.getName(), cookie.getValue());
+                }
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    private static final Map<String, String> HEADER_MAP = new ConcurrentHashMap<>();
 
     public static void readCache() {
         File account = new File("account.dat");
@@ -22,7 +35,8 @@ public class MeetingUtil {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(account))) {
                 Object object;
                 while ((object = ois.readObject()) != null) {
-                    HEADER_LIST.add((Cookie) object);
+                    Cookie cookie = (Cookie) object;
+                    HEADER_MAP.put(cookie.getName(), cookie.getValue());
                 }
             } catch (Exception ignored) {
 
@@ -36,17 +50,16 @@ public class MeetingUtil {
         if (account.exists()) {
             account.delete();
         }
-        if (CollectionUtils.isEmpty(HEADER_LIST)) {
+        if (CollectionUtils.isEmpty(HEADER_MAP)) {
             return;
         }
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(account))) {
-            for (int i = 0; i < HEADER_LIST.size(); i++) {
-                oos.writeObject(HEADER_LIST.get(i));
-                if (i == HEADER_LIST.size() - 1) {
-                    oos.writeObject(null);
-                    oos.flush();
-                }
+            for (Map.Entry<String, String> entry : HEADER_MAP.entrySet()) {
+                Cookie cookie = new BasicClientCookie2(entry.getKey(), entry.getValue());
+                oos.writeObject(cookie);
             }
+            oos.writeObject(null);
+            oos.flush();
         } catch (Exception ignored) {
 
         }
@@ -62,7 +75,7 @@ public class MeetingUtil {
      * @since v1.0.0
      */
     public static void flashHeader(List<Header> headers) {
-        HEADER_LIST.clear();
+        HEADER_MAP.clear();
         addHeader(headers);
     }
 
@@ -70,30 +83,29 @@ public class MeetingUtil {
         for (Header header : headers) {
             String value = header.getValue();
             String cookieString = value.split(";")[0];
-            Cookie cookie = new BasicClientCookie2(cookieString.split("=")[0], cookieString.split("=")[1]);
-            HEADER_LIST.add(cookie);
+            HEADER_MAP.put(cookieString.split("=")[0], cookieString.split("=")[1]);
         }
     }
 
     public static boolean haveAccount() {
-        return !CollectionUtils.isEmpty(HEADER_LIST);
+        return !CollectionUtils.isEmpty(HEADER_MAP);
     }
 
     public static void logout() {
-        HEADER_LIST.clear();
+        HEADER_MAP.clear();
     }
 
     public static String getUid() {
-        for (Cookie cookie : HEADER_LIST) {
-            if ("mid".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return "";
+        return HEADER_MAP.getOrDefault("mid", "");
     }
 
     public static List<Cookie> getHeaderList() {
-        return HEADER_LIST;
+        List<Cookie> cookieList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : HEADER_MAP.entrySet()) {
+            Cookie cookie = new BasicClientCookie2(entry.getKey(), entry.getValue());
+            cookieList.add(cookie);
+        }
+        return cookieList;
     }
 
     public static boolean checkCode(int code) {
