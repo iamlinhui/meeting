@@ -12,21 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MeetingUtil {
 
-    public static void main(String[] args) {
-        File account = new File("account.dat");
-        if (account.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(account))) {
-                Object object;
-                while ((object = ois.readObject()) != null) {
-                    Cookie cookie = (Cookie) object;
-                    HEADER_MAP.put(cookie.getName(), cookie.getValue());
-                }
-            } catch (Exception ignored) {
-
-            }
-        }
-    }
-
     private static final Map<String, String> HEADER_MAP = new ConcurrentHashMap<>();
 
     public static void readCache() {
