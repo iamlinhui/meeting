@@ -63,6 +63,10 @@ public class MeetingUtil {
      */
     public static void flashHeader(List<Header> headers) {
         HEADER_LIST.clear();
+        addHeader(headers);
+    }
+
+    public static void addHeader(List<Header> headers) {
         for (Header header : headers) {
             String value = header.getValue();
             String cookieString = value.split(";")[0];

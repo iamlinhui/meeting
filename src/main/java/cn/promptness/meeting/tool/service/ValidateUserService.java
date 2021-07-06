@@ -32,6 +32,7 @@ public class ValidateUserService extends Service<String> {
                 HttpResult httpResult = httpClientUtil.doGet("https://api.oa.fenqile.com/oa/api/user/session.json", MeetingUtil.getHeaderList());
                 Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {}.getType());
                 if (response.isSuccess()) {
+                    MeetingUtil.addHeader(httpResult.getHeaderList("Set-Cookie"));
                     return response.getResult().stream().findFirst().orElse(new Session()).getName();
                 }
                 return null;

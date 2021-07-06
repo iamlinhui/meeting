@@ -71,6 +71,9 @@ public class MeetingTask implements Runnable {
     }
 
     private int checkContent(HttpResult httpResult) {
+        if (httpResult.isSuccess()) {
+            MeetingUtil.addHeader(httpResult.getHeaderList("Set-Cookie"));
+        }
         // 0默认 1成功  2时间未到  3已经被占有了
         Response<?> response = httpResult.getContent(Response.class);
         if (response.getCode() == 0) {

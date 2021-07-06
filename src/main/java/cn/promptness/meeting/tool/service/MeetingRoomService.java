@@ -34,6 +34,7 @@ public class MeetingRoomService extends Service<List<Room>> {
                 if (MeetingUtil.checkCode(response.getCode())) {
                     return null;
                 }
+                MeetingUtil.addHeader(httpResult.getHeaderList("Set-Cookie"));
                 return Optional.ofNullable(response.getResult()).orElse(new ArrayList<>());
             }
         };
