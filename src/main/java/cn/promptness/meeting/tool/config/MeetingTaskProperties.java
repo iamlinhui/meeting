@@ -5,6 +5,7 @@ import cn.promptness.meeting.tool.utils.MeetingUtil;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,7 +15,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class MeetingTaskProperties {
+public class MeetingTaskProperties implements Serializable {
+
+    private static final long serialVersionUID = 7209286665289125724L;
 
     private Integer plusDays;
     private String startTime;

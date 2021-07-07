@@ -5,6 +5,7 @@ import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
+import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.collections.FXCollections;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -103,6 +105,7 @@ public class MainController {
         }
 
         initGridPane();
+        readTaskProperties();
     }
 
     @FXML
@@ -239,5 +242,32 @@ public class MainController {
 
     public MeetingTaskProperties buildMeetingTaskProperties() {
         return new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
+    }
+
+    @PreDestroy
+    public void cache() {
+        MeetingUtil.cacheProperties(buildMeetingTaskProperties());
+    }
+
+    private void readTaskProperties() {
+        MeetingTaskProperties meetingTaskProperties = MeetingUtil.readProperties();
+        if (meetingTaskProperties == null) {
+            return;
+        }
+
+        plusDays.setValue(meetingTaskProperties.getPlusDays());
+        startTime.setValue(meetingTaskProperties.getStartTime());
+        endTime.setValue(meetingTaskProperties.getEndTime());
+        cronDescription.setValue(meetingTaskProperties.getCronDescription());
+        multipleChoice.setSelected(meetingTaskProperties.getMultipleChoice());
+
+        for (String roomId : meetingTaskProperties.getRoomIdList()) {
+            roomIdList.add(roomId);
+            for (CheckBox checkBox : checkBoxList) {
+                if (Objects.equals(roomId, checkBox.getId())) {
+                    checkBox.setSelected(true);
+                }
+            }
+        }
     }
 }

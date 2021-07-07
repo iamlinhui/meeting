@@ -1,5 +1,6 @@
 package cn.promptness.meeting.tool.utils;
 
+import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import org.apache.http.Header;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie2;
@@ -117,4 +118,32 @@ public class MeetingUtil {
         return weekDays[w];
     }
 
+    public static void cacheProperties(MeetingTaskProperties meetingTaskProperties) {
+        File task = new File("task.dat");
+        if (task.exists()) {
+            task.delete();
+        }
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(task))) {
+            oos.writeObject(meetingTaskProperties);
+            oos.writeObject(null);
+            oos.flush();
+        } catch (Exception ignored) {
+
+        }
+    }
+
+    public static MeetingTaskProperties readProperties() {
+        File task = new File("task.dat");
+        if (task.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(task))) {
+                Object object;
+                if ((object = ois.readObject()) != null) {
+                    return (MeetingTaskProperties) object;
+                }
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
 }
