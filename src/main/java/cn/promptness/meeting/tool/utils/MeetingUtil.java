@@ -143,6 +143,7 @@ public class MeetingUtil {
             } catch (Exception ignored) {
 
             }
+            task.delete();
         }
         return null;
     }
