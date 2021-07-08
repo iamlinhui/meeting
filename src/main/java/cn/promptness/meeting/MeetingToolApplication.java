@@ -12,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.Banner;
@@ -51,6 +53,7 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         Parent root = applicationContext.getBean(SpringFxmlLoader.class).load("/fxml/main.fxml");
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
+        new JMetro(Style.LIGHT).setScene(scene);
 
         primaryStage.setTitle(Constant.TITLE + " - Powered By Lynn");
         primaryStage.getIcons().add(new Image("/icon.png"));
