@@ -1,6 +1,7 @@
 package cn.promptness.meeting.tool.controller;
 
 import cn.promptness.httpclient.HttpClientUtil;
+import cn.promptness.httpclient.HttpResult;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,12 +14,9 @@ import java.io.ByteArrayOutputStream;
 
 @Controller
 public class LoginController {
+
     @Resource
     private HttpClientUtil httpClientUtil;
-
-    private String currentTimeMillis;
-    private String token;
-    private boolean codeSuccess;
 
     @FXML
     public ImageView codeImageView;
@@ -28,13 +26,29 @@ public class LoginController {
         token = DigestUtils.md5Hex(currentTimeMillis);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            httpClientUtil.doGet("https://passport.oa.fenqile.com/user/main/qrcode.png?token=" + getToken(), byteArrayOutputStream);
+            HttpResult httpResult = httpClientUtil.doGet("https://passport.oa.fenqile.com/user/main/qrcode.png?token=" + getToken(), byteArrayOutputStream);
+            codeSuccess = httpResult.isSuccess();
             codeImageView.setImage(new Image(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
-            codeSuccess = true;
         } catch (Exception e) {
             codeSuccess = false;
         }
     }
+
+
+    /**
+     * 生成二维码需要的客户端token的基准时间
+     */
+    private String currentTimeMillis;
+
+    /**
+     * 生成二维码需要的客户端token
+     */
+    private String token;
+
+    /**
+     * 二维码是否加载成功
+     */
+    private boolean codeSuccess;
 
     public String getCurrentTimeMillis() {
         return currentTimeMillis;
