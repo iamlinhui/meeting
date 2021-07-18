@@ -62,9 +62,9 @@ public class MainController {
     public void initialize() {
 
         plusDays.setItems(FXCollections.observableArrayList(7, 6, 5, 4, 3, 2, 1, 0));
-        startTime.setItems(FXCollections.observableArrayList(Constant.ITEMS));
-        endTime.setItems(FXCollections.observableArrayList(Constant.ITEMS));
-        cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_LIST.keySet()));
+        startTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
+        endTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
+        cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_MAP.keySet()));
 
         plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
@@ -81,12 +81,12 @@ public class MainController {
         });
 
         cronDescription.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String value = Constant.CRON_LIST.get(newValue);
+            String value = Constant.CRON_MAP.get(newValue);
             flag[2] = CronSequenceGenerator.isValidExpression(value);
             checkSubmit();
         });
 
-        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_LIST.entrySet()) {
+        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
             CheckBox checkBox = new CheckBox();
             checkBox.setText(entry.getValue());
             checkBox.setId(entry.getKey());
@@ -111,7 +111,7 @@ public class MainController {
     @FXML
     public void submit() {
         // 确认信息
-        MeetingTaskProperties meetingTaskProperties = new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
+        MeetingTaskProperties meetingTaskProperties = buildMeetingTaskProperties();
         if (isRunning()) {
             if (alertStop(meetingTaskProperties)) {
                 stopTask();

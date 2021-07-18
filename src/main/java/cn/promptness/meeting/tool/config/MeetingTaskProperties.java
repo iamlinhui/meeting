@@ -45,7 +45,7 @@ public class MeetingTaskProperties implements Serializable {
         stringBuilder.append("多选开关:\n").append(Boolean.TRUE.equals(multipleChoice) ? "开" : "关").append("\n\n");
         stringBuilder.append("预定列表:\n");
         for (String roomId : roomIdList) {
-            stringBuilder.append(Constant.ROOM_INFO_LIST.get(roomId)).append("\n");
+            stringBuilder.append(Constant.ROOM_INFO_MAP.get(roomId)).append("\n");
         }
         stringBuilder.append("\n触发周期:\n").append(cronDescription).append("\n\n");
         return stringBuilder.toString();
@@ -66,7 +66,7 @@ public class MeetingTaskProperties implements Serializable {
         if (StringUtils.isEmpty(cronDescription)) {
             return null;
         }
-        return Constant.CRON_LIST.get(cronDescription);
+        return Constant.CRON_MAP.get(cronDescription);
     }
 
     public Integer getPlusDays() {

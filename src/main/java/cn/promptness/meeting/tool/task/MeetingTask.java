@@ -42,7 +42,7 @@ public class MeetingTask implements Runnable {
             for (int i = 0; i < roomIdList.size(); i++) {
                 String roomId = roomIdList.get(i);
                 paramMap.put("room_id", roomId);
-                log.info("---预定{}会议室---", Constant.ROOM_INFO_LIST.get(roomId));
+                log.info("---预定{}会议室---", Constant.ROOM_INFO_MAP.get(roomId));
                 HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, MeetingUtil.getHeaderList());
                 result[i] = this.checkContent(httpResult);
                 if (result[i] == 1 && !Objects.equals(Boolean.TRUE, meetingTaskProperties.getMultipleChoice())) {

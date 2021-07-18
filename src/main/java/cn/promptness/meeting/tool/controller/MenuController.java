@@ -82,7 +82,7 @@ public class MenuController {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("使用说明");
-        alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序");
+        alert.setContentText("1.打开MOA扫码登录\n2.会议室的勾选顺序决定预定的顺序\n3.多选开关是指预定勾选的全部会议室");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
