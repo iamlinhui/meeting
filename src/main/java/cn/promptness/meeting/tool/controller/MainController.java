@@ -50,8 +50,6 @@ public class MainController {
     @FXML
     public RadioButton multipleChoice;
     @Resource
-    private MenuController menuController;
-    @Resource
     private HttpClientUtil httpClientUtil;
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
@@ -72,11 +70,11 @@ public class MainController {
         });
 
         startTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            extracted();
+            checkTime();
             checkSubmit();
         });
         endTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            extracted();
+            checkTime();
             checkSubmit();
         });
 
@@ -116,19 +114,13 @@ public class MainController {
             if (alertStop(meetingTaskProperties)) {
                 stopTask();
             }
-        } else {
-            ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
-            validateUserService.start();
-            validateUserService.setOnSucceeded(event -> {
-                if (StringUtils.isEmpty(event.getSource().getValue())) {
-                    menuController.login();
-                    return;
-                }
-                if (alertStart(meetingTaskProperties)) {
-                    startTask(meetingTaskProperties);
-                }
-            });
+            return;
         }
+        applicationContext.getBean(ValidateUserService.class).expect(event -> {
+            if (alertStart(meetingTaskProperties)) {
+                startTask(meetingTaskProperties);
+            }
+        }).start();
     }
 
     private boolean alertStart(MeetingTaskProperties meetingTaskProperties) {
@@ -152,42 +144,19 @@ public class MainController {
         return Objects.equals(ButtonType.OK, buttonType);
     }
 
-    private void extracted() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-        try {
-            if (StringUtils.isEmpty(startTime.getValue()) || StringUtils.isEmpty(endTime.getValue())) {
-                flag[1] = false;
-            } else {
-                Date parseStartTime = simpleDateFormat.parse(startTime.getValue());
-                Date parseEndTime = simpleDateFormat.parse(endTime.getValue());
-                flag[1] = parseStartTime.before(parseEndTime);
-                if (!flag[1]) {
-                    TooltipUtil.show("时间范围不正确!");
-                }
-            }
-        } catch (ParseException e) {
-            flag[1] = false;
-        }
-    }
-
-
     private void stopTask() {
-        if (isRunning()) {
-            ScheduledFuture<?> scheduledFuture = taskFutures.poll();
-            scheduledFuture.cancel(true);
-            disable(false);
-            TooltipUtil.show("暂停成功!");
-        }
+        ScheduledFuture<?> scheduledFuture = taskFutures.poll();
+        scheduledFuture.cancel(true);
+        disable(false);
+        TooltipUtil.show("暂停成功!");
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
-        if (!isRunning()) {
-            MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, httpClientUtil);
-            ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
-            taskFutures.add(schedule);
-            disable(true);
-            TooltipUtil.show("开启成功!");
-        }
+        MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, httpClientUtil);
+        ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
+        taskFutures.add(schedule);
+        disable(true);
+        TooltipUtil.show("开启成功!");
     }
 
     private void disable(boolean disable) {
@@ -200,14 +169,6 @@ public class MainController {
             checkBox.setDisable(disable);
         }
         okButton.setText(disable ? "暂停" : "开启");
-    }
-
-    private void checkSubmit() {
-        boolean result = true;
-        for (boolean b : flag) {
-            result &= b;
-        }
-        okButton.setDisable(!result);
     }
 
     private void initGridPane() {
@@ -269,5 +230,31 @@ public class MainController {
                 }
             }
         }
+    }
+
+    private void checkTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+        try {
+            if (StringUtils.isEmpty(startTime.getValue()) || StringUtils.isEmpty(endTime.getValue())) {
+                flag[1] = false;
+            } else {
+                Date parseStartTime = simpleDateFormat.parse(startTime.getValue());
+                Date parseEndTime = simpleDateFormat.parse(endTime.getValue());
+                flag[1] = parseStartTime.before(parseEndTime);
+                if (!flag[1]) {
+                    TooltipUtil.show("时间范围不正确!");
+                }
+            }
+        } catch (ParseException e) {
+            flag[1] = false;
+        }
+    }
+
+    private void checkSubmit() {
+        boolean result = true;
+        for (boolean b : flag) {
+            result &= b;
+        }
+        okButton.setDisable(!result);
     }
 }

@@ -1,14 +1,10 @@
 package cn.promptness.meeting.tool.task;
 
-import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
-import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Platform;
-import javafx.stage.Stage;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
@@ -22,31 +18,12 @@ import javax.annotation.Resource;
 public class ContinuationTask {
 
     @Resource
-    private MenuController menuController;
-    @Resource
     private ConfigurableApplicationContext applicationContext;
 
     @Scheduled(initialDelay = 10000, fixedRate = 15000)
     public void continuation() {
         if (MeetingUtil.haveAccount()) {
-            Platform.runLater(() -> {
-                ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
-                validateUserService.start();
-                validateUserService.setOnSucceeded(event -> {
-                    if (StringUtils.isEmpty(event.getSource().getValue())) {
-
-                        Stage stage = SystemTrayUtil.getPrimaryStage();
-                        if (stage.isIconified()) {
-                            stage.setIconified(false);
-                        }
-                        if (!stage.isShowing()) {
-                            stage.show();
-                        }
-                        stage.toFront();
-                        menuController.login();
-                    }
-                });
-            });
+            Platform.runLater(() -> applicationContext.getBean(ValidateUserService.class).expect(null).start());
         }
     }
 }

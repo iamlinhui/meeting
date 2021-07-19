@@ -25,11 +25,7 @@ public class CancelMeetingRoomService extends Service<HttpResult> {
         return new Task<HttpResult>() {
             @Override
             protected HttpResult call() throws Exception {
-                HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", getMeetingId()), MeetingUtil.getHeaderList());
-                if (httpResult.isSuccess()) {
-                    MeetingUtil.addHeader(httpResult.getHeaderList("Set-Cookie"));
-                }
-                return httpResult;
+                return httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", getMeetingId()), MeetingUtil.getHeaderList());
             }
         };
     }

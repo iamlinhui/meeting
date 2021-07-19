@@ -7,22 +7,29 @@ import cn.promptness.meeting.tool.pojo.Login;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import org.apache.http.Header;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @Component
-@Scope("prototype")
-public class CheckLoginService extends Service<Boolean> {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class CheckLoginService extends BaseService<Boolean> {
     @Resource
     private LoginController loginController;
     @Resource
     private HttpClientUtil httpClientUtil;
-
+    @Resource
+    private ConfigurableApplicationContext applicationContext;
     private Stage loginStage;
 
     @Override
@@ -47,6 +54,16 @@ public class CheckLoginService extends Service<Boolean> {
 
     public CheckLoginService setStage(final Stage loginStage) {
         this.loginStage = loginStage;
+        return this;
+    }
+
+    @Override
+    public Service<Boolean> expect(Callback callback) {
+        super.setOnSucceeded(event -> {
+            if (Objects.equals(Boolean.TRUE, event.getSource().getValue())) {
+                applicationContext.getBean(ValidateUserService.class).expect(callback).start();
+            }
+        });
         return this;
     }
 }

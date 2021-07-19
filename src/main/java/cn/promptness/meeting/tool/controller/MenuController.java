@@ -3,8 +3,6 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
-import cn.promptness.meeting.tool.pojo.Room;
-import cn.promptness.meeting.tool.service.CancelMeetingRoomService;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
@@ -12,24 +10,20 @@ import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Controller
 public class MenuController {
@@ -95,22 +89,16 @@ public class MenuController {
         alert.setHeaderText("运行状态");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
-        if (mainController.isRunning()) {
-            ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
-            validateUserService.start();
-            validateUserService.setOnSucceeded(event -> {
-                if (StringUtils.isEmpty(event.getSource().getValue())) {
-                    login();
-                    return;
-                }
-                MeetingTaskProperties meetingTaskProperties = mainController.buildMeetingTaskProperties();
-                alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
-                alert.showAndWait();
-            });
-        } else {
+        if (!mainController.isRunning()) {
             alert.setContentText("请先开启任务!");
             alert.showAndWait();
+            return;
         }
+        applicationContext.getBean(ValidateUserService.class).expect(event -> {
+            MeetingTaskProperties meetingTaskProperties = mainController.buildMeetingTaskProperties();
+            alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+            alert.showAndWait();
+        }).start();
     }
 
     @FXML
@@ -120,72 +108,12 @@ public class MenuController {
 
     @FXML
     public void list() {
-
-        MeetingRoomService meetingRoomService = applicationContext.getBean(MeetingRoomService.class);
-        meetingRoomService.start();
-
-        meetingRoomService.setOnSucceeded(event -> {
-            if (event.getSource().getValue() == null) {
-                login();
-                return;
-            }
-            List<Room> roomList = (List<Room>) event.getSource().getValue();
-
-            ArrayList<String> cancelList = new ArrayList<>();
-            ButtonType cancel = new ButtonType("取消会议室");
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle(Constant.TITLE);
-            dialog.setHeaderText("成功列表");
-            dialog.initOwner(SystemTrayUtil.getPrimaryStage());
-            dialog.getDialogPane().getButtonTypes().add(cancel);
-
-
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(20));
-            grid.add(new Text("会议地点"), 0, 0);
-            grid.add(new Text("会议日期"), 1, 0);
-            grid.add(new Text("开始时间"), 2, 0);
-            grid.add(new Text("结束时间"), 3, 0);
-            grid.add(new Text("星期"), 4, 0);
-            for (int i = 0; i < roomList.size(); i++) {
-                Room room = roomList.get(i);
-                CheckBox checkBox = new CheckBox(room.getFloor() + "F" + room.getRoomName());
-                checkBox.setId(room.getMeetingId().toString());
-
-                checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                    cancelList.remove(checkBox.getId());
-                    if (checkBox.isSelected()) {
-                        cancelList.add(checkBox.getId());
-                    }
-                });
-
-                grid.add(checkBox, 0, i + 1);
-                grid.add(new Text(room.getMeetingDate()), 1, i + 1);
-                grid.add(new Text(room.getStartTime()), 2, i + 1);
-                grid.add(new Text(room.getEndTime()), 3, i + 1);
-                grid.add(new Text(MeetingUtil.dateToWeek(room.getMeetingDate())), 4, i + 1);
-
-                dialog.getDialogPane().setContent(grid);
-            }
-
-            ButtonType buttonType = dialog.showAndWait().orElse(null);
-            if (Objects.equals(cancel, buttonType)) {
-                for (String meetingId : cancelList) {
-                    applicationContext.getBean(CancelMeetingRoomService.class).setMeetingId(meetingId).start();
-                }
-            }
-        });
-
-
+        applicationContext.getBean(ValidateUserService.class).expect(event -> applicationContext.getBean(MeetingRoomService.class).expect(null).start()).start();
     }
-
 
     @FXML
     public void account() {
-
+        // 有账户 点击时就是注销
         if (MeetingUtil.haveAccount()) {
             login();
             return;
@@ -209,22 +137,11 @@ public class MenuController {
         loginStage.setY(y);
         loginStage.show();
 
-        CheckLoginService checkLoginService = applicationContext.getBean(CheckLoginService.class).setStage(loginStage);
-        checkLoginService.start();
-
-        checkLoginService.setOnSucceeded(event -> {
-            if (Objects.equals(Boolean.TRUE, event.getSource().getValue())) {
-                ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
-                validateUserService.start();
-                validateUserService.setOnSucceeded(validateEvent -> {
-                    if (!StringUtils.isEmpty(validateEvent.getSource().getValue())) {
-                        loginStage.close();
-                        accountAction.setText("注销");
-                        accountTitle.setText(validateEvent.getSource().getValue().toString());
-                    }
-                });
-            }
-        });
+        applicationContext.getBean(CheckLoginService.class).setStage(loginStage).expect(event -> {
+            loginStage.close();
+            accountAction.setText("注销");
+            accountTitle.setText(event.getSource().getValue().toString());
+        }).start();
     }
 
     public void login() {
@@ -236,16 +153,10 @@ public class MenuController {
 
     public void initAccount() {
         MeetingUtil.readCache();
-        ValidateUserService validateUserService = applicationContext.getBean(ValidateUserService.class);
-        validateUserService.start();
-        validateUserService.setOnSucceeded(event -> {
-            if (StringUtils.isEmpty(event.getSource().getValue())) {
-                login();
-            } else {
-                accountAction.setText("注销");
-                accountTitle.setText(event.getSource().getValue().toString());
-            }
-        });
+        applicationContext.getBean(ValidateUserService.class).expect(event -> {
+            accountAction.setText("注销");
+            accountTitle.setText(event.getSource().getValue().toString());
+        }).start();
     }
 
 }
