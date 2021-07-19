@@ -94,11 +94,6 @@ public class MeetingUtil {
         return cookieList;
     }
 
-    public static boolean checkCode(int code) {
-        // 未登录或登录超时，请重新登录
-        return 90001002 == code || 19002028 == code;
-    }
-
     public static String dateToWeek(String datetime) {
 
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");

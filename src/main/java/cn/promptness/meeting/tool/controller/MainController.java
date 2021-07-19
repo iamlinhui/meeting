@@ -52,6 +52,11 @@ public class MainController {
     @Resource
     private HttpClientUtil httpClientUtil;
 
+    @PreDestroy
+    public void cache() {
+        MeetingUtil.cacheProperties(buildMeetingTaskProperties());
+    }
+
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
     private final ArrayList<String> roomIdList = new ArrayList<>();
     private final ArrayList<CheckBox> checkBoxList = new ArrayList<>();
@@ -64,44 +69,7 @@ public class MainController {
         endTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
         cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_MAP.keySet()));
 
-        plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
-            checkSubmit();
-        });
-
-        startTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            checkTime();
-            checkSubmit();
-        });
-        endTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            checkTime();
-            checkSubmit();
-        });
-
-        cronDescription.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String value = Constant.CRON_MAP.get(newValue);
-            flag[2] = CronSequenceGenerator.isValidExpression(value);
-            checkSubmit();
-        });
-
-        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
-            CheckBox checkBox = new CheckBox();
-            checkBox.setText(entry.getValue());
-            checkBox.setId(entry.getKey());
-            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                roomIdList.remove(checkBox.getId());
-                if (checkBox.isSelected()) {
-                    roomIdList.add(checkBox.getId());
-                }
-                flag[3] = !CollectionUtils.isEmpty(roomIdList);
-                if (!flag[3]) {
-                    TooltipUtil.show("至少选择一个!");
-                }
-                checkSubmit();
-            });
-            checkBoxList.add(checkBox);
-        }
-
+        addListener();
         initGridPane();
         readTaskProperties();
     }
@@ -205,11 +173,6 @@ public class MainController {
         return new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
     }
 
-    @PreDestroy
-    public void cache() {
-        MeetingUtil.cacheProperties(buildMeetingTaskProperties());
-    }
-
     private void readTaskProperties() {
         MeetingTaskProperties meetingTaskProperties = MeetingUtil.readProperties();
         if (meetingTaskProperties == null) {
@@ -256,5 +219,46 @@ public class MainController {
             result &= b;
         }
         okButton.setDisable(!result);
+    }
+
+
+    private void addListener() {
+        plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
+            checkSubmit();
+        });
+
+        startTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            checkTime();
+            checkSubmit();
+        });
+        endTime.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            checkTime();
+            checkSubmit();
+        });
+
+        cronDescription.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            String value = Constant.CRON_MAP.get(newValue);
+            flag[2] = CronSequenceGenerator.isValidExpression(value);
+            checkSubmit();
+        });
+
+        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
+            CheckBox checkBox = new CheckBox();
+            checkBox.setText(entry.getValue());
+            checkBox.setId(entry.getKey());
+            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                roomIdList.remove(checkBox.getId());
+                if (checkBox.isSelected()) {
+                    roomIdList.add(checkBox.getId());
+                }
+                flag[3] = !CollectionUtils.isEmpty(roomIdList);
+                if (!flag[3]) {
+                    TooltipUtil.show("至少选择一个!");
+                }
+                checkSubmit();
+            });
+            checkBoxList.add(checkBox);
+        }
     }
 }
