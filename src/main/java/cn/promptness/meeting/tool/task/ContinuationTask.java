@@ -5,6 +5,7 @@ import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.application.Platform;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
  * @date 2021/1/8 14:18
  * @since v1.0.0
  */
+@Component
 public class ContinuationTask {
 
     @Resource

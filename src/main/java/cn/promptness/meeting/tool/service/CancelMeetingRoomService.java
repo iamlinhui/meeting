@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CancelMeetingRoomService extends Service<HttpResult> {
+public class CancelMeetingRoomService extends BaseService<HttpResult> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
@@ -37,6 +37,11 @@ public class CancelMeetingRoomService extends Service<HttpResult> {
 
     public CancelMeetingRoomService setMeetingId(String meetingId) {
         this.meetingId = meetingId;
+        return this;
+    }
+
+    @Override
+    public Service<HttpResult> expect(Callback callback) {
         return this;
     }
 }

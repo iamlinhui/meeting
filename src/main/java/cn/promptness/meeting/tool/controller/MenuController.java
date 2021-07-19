@@ -43,7 +43,11 @@ public class MenuController {
     private MainController mainController;
 
     public void initialize() {
-
+        MeetingUtil.readCache();
+        applicationContext.getBean(ValidateUserService.class).expect(event -> {
+            accountAction.setText("注销");
+            accountTitle.setText(event.getSource().getValue().toString());
+        }).start();
     }
 
     @FXML
@@ -138,7 +142,6 @@ public class MenuController {
         loginStage.show();
 
         applicationContext.getBean(CheckLoginService.class).setStage(loginStage).expect(event -> {
-            loginStage.close();
             accountAction.setText("注销");
             accountTitle.setText(event.getSource().getValue().toString());
         }).start();
@@ -149,14 +152,6 @@ public class MenuController {
         accountAction.setText("登录");
         accountTitle.setText("账户");
         account();
-    }
-
-    public void initAccount() {
-        MeetingUtil.readCache();
-        applicationContext.getBean(ValidateUserService.class).expect(event -> {
-            accountAction.setText("注销");
-            accountTitle.setText(event.getSource().getValue().toString());
-        }).start();
     }
 
 }

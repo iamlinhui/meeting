@@ -1,9 +1,7 @@
 package cn.promptness.meeting;
 
 import cn.promptness.meeting.tool.SpringFxmlLoader;
-import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.data.Constant;
-import cn.promptness.meeting.tool.task.ContinuationTask;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
@@ -14,8 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -61,12 +57,6 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         primaryStage.setResizable(false);
         primaryStage.show();
         SystemTrayUtil.systemTray(primaryStage, Constant.TITLE);
-        applicationContext.getBean(MenuController.class).initAccount();
-
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ContinuationTask.class);
-        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
-        defaultListableBeanFactory.registerBeanDefinition(ContinuationTask.class.getName(), beanDefinitionBuilder.getBeanDefinition());
-        applicationContext.getBean(ContinuationTask.class);
     }
 
     @Override
