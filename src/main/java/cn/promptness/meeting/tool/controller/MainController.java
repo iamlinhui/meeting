@@ -68,6 +68,12 @@ public class MainController {
         startTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
         endTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
         cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_MAP.keySet()));
+        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
+            CheckBox checkBox = new CheckBox();
+            checkBox.setText(entry.getValue());
+            checkBox.setId(entry.getKey());
+            checkBoxList.add(checkBox);
+        }
 
         addListener();
         initGridPane();
@@ -186,10 +192,10 @@ public class MainController {
         multipleChoice.setSelected(meetingTaskProperties.getMultipleChoice());
 
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
-            roomIdList.add(roomId);
             for (CheckBox checkBox : checkBoxList) {
                 if (Objects.equals(roomId, checkBox.getId())) {
                     checkBox.setSelected(true);
+                    roomIdList.add(roomId);
                 }
             }
         }
@@ -243,10 +249,7 @@ public class MainController {
             checkSubmit();
         });
 
-        for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
-            CheckBox checkBox = new CheckBox();
-            checkBox.setText(entry.getValue());
-            checkBox.setId(entry.getKey());
+        for (CheckBox checkBox : checkBoxList) {
             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 roomIdList.remove(checkBox.getId());
                 if (checkBox.isSelected()) {
@@ -258,7 +261,6 @@ public class MainController {
                 }
                 checkSubmit();
             });
-            checkBoxList.add(checkBox);
         }
     }
 }
