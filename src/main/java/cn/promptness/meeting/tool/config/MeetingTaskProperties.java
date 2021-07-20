@@ -3,6 +3,7 @@ package cn.promptness.meeting.tool.config;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
@@ -37,6 +38,9 @@ public class MeetingTaskProperties implements Serializable {
 
     @Override
     public String toString() {
+        if (plusDays == null || startTime == null || endTime == null || CollectionUtils.isEmpty(roomIdList) || StringUtils.isEmpty(cronDescription) || multipleChoice == null) {
+            return "";
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("偏移天数:\n").append(plusDays).append("\n\n");
         LocalDateTime firstTime = new CronSequenceGenerator(getCron()).next(new Date()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

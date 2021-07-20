@@ -194,8 +194,8 @@ public class MainController {
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
             for (CheckBox checkBox : checkBoxList) {
                 if (Objects.equals(roomId, checkBox.getId())) {
+                    // 这里会自动触发监听函数
                     checkBox.setSelected(true);
-                    roomIdList.add(roomId);
                 }
             }
         }
