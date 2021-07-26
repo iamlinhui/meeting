@@ -3,12 +3,14 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.service.Callback;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -112,7 +114,7 @@ public class MenuController {
 
     @FXML
     public void list() {
-        applicationContext.getBean(ValidateUserService.class).expect(event -> applicationContext.getBean(MeetingRoomService.class).expect(null).start()).start();
+        applicationContext.getBean(MeetingRoomService.class).expect(event -> login()).start();
     }
 
     @FXML

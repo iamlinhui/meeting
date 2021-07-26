@@ -22,7 +22,7 @@ public class ContinuationTask {
     @Resource
     private ConfigurableApplicationContext applicationContext;
 
-    @Scheduled(initialDelay = 10000, fixedRate = 15000)
+    @Scheduled(initialDelay = 60000, fixedRate = 60000)
     public void continuation() {
         if (MeetingUtil.haveAccount()) {
             Platform.runLater(() -> applicationContext.getBean(ValidateUserService.class).expect(null).start());

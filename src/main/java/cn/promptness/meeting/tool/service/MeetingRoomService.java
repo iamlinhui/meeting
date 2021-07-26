@@ -2,6 +2,7 @@ package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
@@ -38,6 +39,8 @@ public class MeetingRoomService extends BaseService<List<Room>> {
     private HttpClientUtil httpClientUtil;
     @Resource
     private ConfigurableApplicationContext applicationContext;
+    @Resource
+    private MenuController menuController;
 
     @Override
     protected Task<List<Room>> createTask() {
@@ -45,8 +48,12 @@ public class MeetingRoomService extends BaseService<List<Room>> {
             @Override
             protected List<Room> call() throws Exception {
                 HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
-                Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
-                return Optional.ofNullable(response.getResult()).orElse(new ArrayList<>());
+                Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {
+                }.getType());
+                if (response.isSuccess()) {
+                    return Optional.ofNullable(response.getResult()).orElse(new ArrayList<>());
+                }
+                return null;
             }
         };
     }
@@ -101,13 +108,21 @@ public class MeetingRoomService extends BaseService<List<Room>> {
                 return;
             }
             CancelMeetingRoomService cancelMeetingRoomService = applicationContext.getBean(CancelMeetingRoomService.class).setCancelList(cancelList);
-            ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), cancelMeetingRoomService, "会议室取消中...").show();
+            ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), cancelMeetingRoomService).show();
         }
     }
 
     @Override
     public Service<List<Room>> expect(Callback callback) {
-        super.setOnSucceeded(this::listRoom);
+        super.setOnSucceeded(event -> {
+            if (event.getSource().getValue() != null) {
+                listRoom(event);
+                return;
+            }
+            if (callback != null) {
+                callback.call(event);
+            }
+        });
         return this;
     }
 }

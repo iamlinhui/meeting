@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
@@ -20,6 +21,13 @@ public class ProgressUtil {
     private Service<?> work;
 
     private ProgressUtil() {
+    }
+
+    public static ProgressUtil of(Stage parent, Service<?> work) {
+        ProgressUtil ps = new ProgressUtil();
+        ps.work = Objects.requireNonNull(work);
+        ps.init(parent, "");
+        return ps;
     }
 
     /**
@@ -72,7 +80,7 @@ public class ProgressUtil {
         Scene scene = new Scene(vBox);
         scene.setFill(null);
         stage.setScene(scene);
-        stage.setWidth(ad.length() * 8d + 10d);
+        stage.setWidth(StringUtils.isEmpty(ad) ? 100 : ad.length() * 8d + 10d);
         stage.setHeight(100);
 
         // show center of parent
