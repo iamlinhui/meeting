@@ -119,7 +119,7 @@ public class MainController {
     }
 
     private void stopTask() {
-        ScheduledFuture<?> scheduledFuture = taskFutures.poll();
+        ScheduledFuture<?> scheduledFuture = taskFutures.remove();
         scheduledFuture.cancel(true);
         disable(false);
         TooltipUtil.show("暂停成功!");

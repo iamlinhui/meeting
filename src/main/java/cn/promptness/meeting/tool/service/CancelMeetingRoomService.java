@@ -1,47 +1,39 @@
 package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
-import cn.promptness.httpclient.HttpResult;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CancelMeetingRoomService extends BaseService<HttpResult> {
+public class CancelMeetingRoomService extends BaseService<Void> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
 
-    private String meetingId;
+    private List<String> cancelList;
+
+    public CancelMeetingRoomService setCancelList(List<String> cancelList) {
+        this.cancelList = cancelList;
+        return this;
+    }
 
     @Override
-    protected Task<HttpResult> createTask() {
-        return new Task<HttpResult>() {
+    protected Task<Void> createTask() {
+        return new Task<Void>() {
             @Override
-            protected HttpResult call() throws Exception {
-                return httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", getMeetingId()), MeetingUtil.getHeaderList());
+            protected Void call() throws Exception {
+                for (String meetingId : cancelList) {
+                    httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", meetingId), MeetingUtil.getHeaderList());
+                }
+                return null;
             }
         };
-    }
-
-
-    public String getMeetingId() {
-        return meetingId;
-    }
-
-    public CancelMeetingRoomService setMeetingId(String meetingId) {
-        this.meetingId = meetingId;
-        return this;
-    }
-
-    @Override
-    public Service<HttpResult> expect(Callback callback) {
-        return this;
     }
 }

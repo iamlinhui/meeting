@@ -6,6 +6,7 @@ import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import cn.promptness.meeting.tool.utils.ProgressUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import com.google.gson.reflect.TypeToken;
 import javafx.concurrent.Service;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -95,9 +97,11 @@ public class MeetingRoomService extends BaseService<List<Room>> {
 
         ButtonType buttonType = dialog.showAndWait().orElse(null);
         if (Objects.equals(cancel, buttonType)) {
-            for (String meetingId : cancelList) {
-                applicationContext.getBean(CancelMeetingRoomService.class).setMeetingId(meetingId).start();
+            if (CollectionUtils.isEmpty(cancelList)) {
+                return;
             }
+            CancelMeetingRoomService cancelMeetingRoomService = applicationContext.getBean(CancelMeetingRoomService.class).setCancelList(cancelList);
+            ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), cancelMeetingRoomService, "会议室取消中...").show();
         }
     }
 
