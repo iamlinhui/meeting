@@ -34,14 +34,18 @@ public class LoggerAspect {
 
     @Around(value = "cutOne(url,cookies)", argNames = "joinPoint,url,cookies")
     public Object around(ProceedingJoinPoint joinPoint, String url, List<Cookie> cookies) throws Throwable {
-        return around(joinPoint, url, null, cookies);
+        return around(joinPoint, url, new HashMap<>(0), cookies);
     }
 
     @Around(value = "cutTwo(url,params,cookies)", argNames = "joinPoint,url,params,cookies")
     public Object around(ProceedingJoinPoint joinPoint, String url, Map<String, String> params, List<Cookie> cookies) throws Throwable {
         Object result = joinPoint.proceed();
+        logger(url, params, cookies, result);
+        return result;
+    }
 
-        HashMap<String, String> cookieMap = new HashMap<>();
+    private void logger(String url, Map<String, String> params, List<Cookie> cookies, Object result) {
+        HashMap<String, String> cookieMap = new HashMap<>(16);
         for (Cookie cookie : cookies) {
             cookieMap.put(cookie.getName(), cookie.getValue());
         }
@@ -49,7 +53,7 @@ public class LoggerAspect {
         String cookie = gson.toJson(cookieMap);
         String param = gson.toJson(params);
         if (result instanceof HttpResult) {
-            HashMap<String, String> headerMap = new HashMap<>();
+            HashMap<String, String> headerMap = new HashMap<>(16);
             HttpResult httpResult = (HttpResult) result;
             List<Header> headerList = httpResult.getHeaderList("Set-Cookie");
             for (Header header : headerList) {
@@ -60,7 +64,6 @@ public class LoggerAspect {
             String setCookie = gson.toJson(headerMap);
             log.info("请求路径:{},入参:{},Cookie:{},出参:{},Set-Cookie:{}", url, param, cookie, httpResult.getMessage(), setCookie);
         }
-        return result;
     }
 
 }
