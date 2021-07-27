@@ -62,7 +62,7 @@ public class LoggerAspect {
                 headerMap.put(cookieString.split("=")[0], cookieString.split("=")[1]);
             }
             String setCookie = gson.toJson(headerMap);
-            log.info("请求路径:{},入参:{},Cookie:{},出参:{},Set-Cookie:{}", url, param, cookie, httpResult.getMessage(), setCookie);
+            log.debug("请求路径:{},入参:{},Cookie:{},出参:{},Set-Cookie:{}", url, param, cookie, httpResult.getMessage(), setCookie);
         }
     }
 
