@@ -36,8 +36,7 @@ public class ValidateUserService extends BaseService<String> {
                     return null;
                 }
                 HttpResult httpResult = httpClientUtil.doGet("https://api.oa.fenqile.com/oa/api/user/session.json?resource_sn=NEWAPR_OA", MeetingUtil.getHeaderList());
-                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {
-                }.getType());
+                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {}.getType());
                 if (response.isSuccess()) {
                     return response.getResult().stream().findFirst().orElse(new Session()).getName();
                 }
