@@ -22,6 +22,10 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 @SpringBootApplication
 @EnableScheduling
@@ -29,10 +33,23 @@ public class MeetingToolApplication extends Application implements ApplicationLi
 
     private ConfigurableApplicationContext applicationContext;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.setProperty("java.awt.headless", "false");
         if (!SystemTray.isSupported()) {
             System.exit(1);
+        }
+        Process process = Runtime.getRuntime().exec("TASKLIST /NH /FO CSV");
+        try (InputStream inputStream = process.getInputStream()) {
+            try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream)) {
+                try (BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        if (line.contains("Meeting Tool")) {
+                            System.exit(1);
+                        }
+                    }
+                }
+            }
         }
         Application.launch(MeetingToolApplication.class, args);
     }
