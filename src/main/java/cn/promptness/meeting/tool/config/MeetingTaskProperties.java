@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -127,5 +128,9 @@ public class MeetingTaskProperties implements Serializable {
         LocalDateTime start = firstTime.plusDays(plusDays).toLocalDate().atTime(localTime);
 
         return firstTime.isBefore(start);
+    }
+    
+    public String getMeetingDate() {
+        return LocalDate.now().plusDays(plusDays).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
