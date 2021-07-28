@@ -11,7 +11,6 @@ import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import com.google.gson.reflect.TypeToken;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -31,7 +30,7 @@ import java.util.Objects;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MeetingRoomService extends BaseService<List<Room>> {
+public class MeetingRoomService extends BaseService<HttpResult> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
@@ -39,24 +38,16 @@ public class MeetingRoomService extends BaseService<List<Room>> {
     private ConfigurableApplicationContext applicationContext;
 
     @Override
-    protected Task<List<Room>> createTask() {
-        return new Task<List<Room>>() {
+    protected Task<HttpResult> createTask() {
+        return new Task<HttpResult>() {
             @Override
-            protected List<Room> call() throws Exception {
-                HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
-                Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
-                if (response.isSuccess()) {
-                    return response.getResult();
-                }
-                return null;
+            protected HttpResult call() throws Exception {
+                return httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
             }
         };
     }
 
-    @SuppressWarnings(value = "unchecked")
-    private void listRoom(WorkerStateEvent event) {
-        List<Room> roomList = (List<Room>) event.getSource().getValue();
-
+    private void listRoom(List<Room> roomList) {
         ArrayList<String> cancelList = new ArrayList<>();
         ButtonType cancel = new ButtonType("取消会议室");
 
@@ -108,10 +99,12 @@ public class MeetingRoomService extends BaseService<List<Room>> {
     }
 
     @Override
-    public Service<List<Room>> expect(Callback callback) {
+    public Service<HttpResult> expect(Callback callback) {
         super.setOnSucceeded(event -> {
-            if (event.getSource().getValue() != null) {
-                listRoom(event);
+            HttpResult httpResult = (HttpResult) event.getSource().getValue();
+            if (httpResult.isSuccess()) {
+                Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
+                listRoom(response.getResult());
                 return;
             }
             if (callback != null) {

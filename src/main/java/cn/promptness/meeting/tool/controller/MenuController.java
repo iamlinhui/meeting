@@ -3,14 +3,12 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
-import cn.promptness.meeting.tool.service.Callback;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -121,10 +119,18 @@ public class MenuController {
     public void account() {
         // 有账户 点击时就是注销
         if (MeetingUtil.haveAccount()) {
-            login();
+            doLogout();
             return;
         }
+        doLogin();
+    }
 
+    public void login() {
+        doLogout();
+        doLogin();
+    }
+
+    private void doLogin() {
         Stage primaryStage = SystemTrayUtil.getPrimaryStage();
         Parent root = primaryStage.getScene().getRoot();
         double x = TooltipUtil.getScreenX(root) + TooltipUtil.getWidth(root) / 3;
@@ -149,11 +155,10 @@ public class MenuController {
         }).start();
     }
 
-    public void login() {
+    private void doLogout() {
         MeetingUtil.logout();
         accountAction.setText("登录");
         accountTitle.setText("账户");
-        account();
     }
 
 }
