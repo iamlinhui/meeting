@@ -1,5 +1,6 @@
 package cn.promptness.meeting.tool.utils;
 
+import cn.promptness.meeting.tool.data.Constant;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class SystemTrayUtil {
     }
 
     private static Stage primaryStage;
+    private static TrayIcon trayIcon;
 
     public static void systemTray(Stage stage, String toolTip) {
         primaryStage = stage;
@@ -35,7 +37,7 @@ public class SystemTrayUtil {
         //设置悬停提示信息
         Image trayIconImage = Toolkit.getDefaultToolkit().getImage(SystemTrayUtil.class.getResource("/icon.png"));
         int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
-        TrayIcon trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH));
+        trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH));
 
         //设置图标尺寸自动适应
         trayIcon.setImageAutoSize(true);
@@ -57,6 +59,15 @@ public class SystemTrayUtil {
         } catch (Exception e) {
             log.info(e.getMessage());
         }
+    }
+
+    /**
+     * 发送系统通知
+     *
+     * @param text 预定会议室成功
+     */
+    public static void displayMessage(String text) {
+        trayIcon.displayMessage(Constant.TITLE, text, TrayIcon.MessageType.INFO);
     }
 
     private static void addExitListener(MenuItem exitItem) {
