@@ -19,6 +19,8 @@ public class Room {
     private Integer floor;
     @SerializedName("room_name")
     private String roomName;
+    @SerializedName("room_id")
+    private Integer roomId;
 
 
     public String getMeetingDate() {
@@ -69,6 +71,14 @@ public class Room {
         this.roomName = roomName;
     }
 
+    public Integer getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -78,11 +88,11 @@ public class Room {
             return false;
         }
         Room room = (Room) o;
-        return Objects.equals(meetingDate, room.meetingDate) && Objects.equals(meetingId, room.meetingId) && Objects.equals(startTime, room.startTime) && Objects.equals(endTime, room.endTime) && Objects.equals(floor, room.floor) && Objects.equals(roomName, room.roomName);
+        return Objects.equals(meetingDate, room.meetingDate) && Objects.equals(meetingId, room.meetingId) && Objects.equals(startTime, room.startTime) && Objects.equals(endTime, room.endTime) && Objects.equals(floor, room.floor) && Objects.equals(roomName, room.roomName) && Objects.equals(roomId, room.roomId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(meetingDate, meetingId, startTime, endTime, floor, roomName);
+        return Objects.hash(meetingDate, meetingId, startTime, endTime, floor, roomName, roomId);
     }
 }

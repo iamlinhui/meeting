@@ -5,7 +5,9 @@ import cn.promptness.httpclient.HttpResult;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.pojo.Response;
+import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +32,11 @@ public class MeetingTask implements Runnable {
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
             return false;
         }
-
         Map<String, String> paramMap = this.getParamMap();
-
-        List<String> roomIdList = meetingTaskProperties.getRoomIdList();
-        log.info("---开始发送请求---");
-        while (true) {
+        // 获取菜单
+        List<String> roomIdList = filterRoomIdList(paramMap);
+        while (!roomIdList.isEmpty()) {
+            log.info("---开始发送请求---");
             final String end = "---结束发送请求---";
             // 0默认 1成功  2时间未到  3已经被占有了
             int[] result = new int[roomIdList.size()];
@@ -68,12 +69,30 @@ public class MeetingTask implements Runnable {
                 }
             }
         }
+        return false;
+    }
+
+    private List<String> filterRoomIdList(Map<String, String> paramMap) throws Exception {
+        // 过滤被屏蔽的会议室
+        List<String> roomIdList = new ArrayList<>();
+        String meetingDate = paramMap.get("meeting_date");
+        HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingDate), MeetingUtil.getHeaderList());
+        Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
+        if (response.isSuccess()) {
+            List<Integer> menuRoomList = response.getResult().stream().map(Room::getRoomId).collect(Collectors.toList());
+            for (String roomId : meetingTaskProperties.getRoomIdList()) {
+                if (menuRoomList.contains(Integer.valueOf(roomId))) {
+                    roomIdList.add(roomId);
+                }
+            }
+        }
+        return roomIdList;
     }
 
     private int checkContent(HttpResult httpResult) {
         // 0默认 1成功  2时间未到  3已经被占有了
         Response<?> response = httpResult.getContent(Response.class);
-        if (response.getCode() == 0) {
+        if (response.isSuccess()) {
             return 1;
         }
         String message = response.getMessage();

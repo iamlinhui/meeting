@@ -30,7 +30,7 @@ import java.util.Objects;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MeetingRoomService extends BaseService<HttpResult> {
+public class MeetingRoomService extends BaseService<Response<Room>> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
@@ -38,11 +38,12 @@ public class MeetingRoomService extends BaseService<HttpResult> {
     private ConfigurableApplicationContext applicationContext;
 
     @Override
-    protected Task<HttpResult> createTask() {
-        return new Task<HttpResult>() {
+    protected Task<Response<Room>> createTask() {
+        return new Task<Response<Room>>() {
             @Override
-            protected HttpResult call() throws Exception {
-                return httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
+            protected Response<Room> call() throws Exception {
+                HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
+                return httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
             }
         };
     }
@@ -98,12 +99,12 @@ public class MeetingRoomService extends BaseService<HttpResult> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Service<HttpResult> expect(Callback callback) {
+    public Service<Response<Room>> expect(Callback callback) {
         super.setOnSucceeded(event -> {
-            HttpResult httpResult = (HttpResult) event.getSource().getValue();
-            if (httpResult.isSuccess()) {
-                Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
+            Response<Room> response = (Response<Room>) event.getSource().getValue();
+            if (response.isSuccess()) {
                 listRoom(response.getResult());
                 return;
             }

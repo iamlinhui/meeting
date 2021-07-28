@@ -146,10 +146,15 @@ public class MainController {
     }
 
     private void initGridPane() {
+        int halfSize = (checkBoxList.size() % 2 == 0 ? 0 : 1) + checkBoxList.size() / 2;
         for (int i = 0; i < checkBoxList.size(); i++) {
-            gridPane.add(checkBoxList.get(i), 1 + i / 10, 2 + i - (i / 10) * 10);
+            if (i < halfSize) {
+                gridPane.add(checkBoxList.get(i), 1, 2 + i);
+            } else {
+                gridPane.add(checkBoxList.get(i), 2, 2 + i - halfSize);
+            }
         }
-        gridPane.add(okButton, 5, 2 + checkBoxList.size() - 1 - ((checkBoxList.size() - 1) / 10) * 10);
+        gridPane.add(okButton, 5, 2 + halfSize - 1);
     }
 
 
