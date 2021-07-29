@@ -4,6 +4,7 @@ import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.exception.MeetingException;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
@@ -75,7 +76,7 @@ public class MeetingTask implements Runnable {
         HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingTaskProperties.getMeetingDate()), MeetingUtil.getHeaderList());
         Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
         if (!response.isSuccess()) {
-            throw new Exception(response.getMessage());
+            throw new MeetingException(response.getMessage());
         }
         List<Integer> menuRoomList = response.getResult().stream().map(Room::getRoomId).collect(Collectors.toList());
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
@@ -106,7 +107,7 @@ public class MeetingTask implements Runnable {
         if (message.contains(future)) {
             log.error(future);
             // 重试
-            throw new Exception(future);
+            throw new MeetingException(future);
         }
         log.error(message);
         return false;
@@ -115,7 +116,7 @@ public class MeetingTask implements Runnable {
     private RetryTemplate getRetryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
         // 设置重试策略，主要设置重试次数
-        SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections.singletonMap(Exception.class, true));
+        SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections.singletonMap(MeetingException.class, true));
         // 设置重试回退操作策略，主要设置重试间隔时间
         FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
         fixedBackOffPolicy.setBackOffPeriod(3000);
