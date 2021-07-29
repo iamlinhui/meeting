@@ -1,6 +1,5 @@
 package cn.promptness.meeting.tool.controller;
 
-import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.ValidateUserService;
@@ -13,9 +12,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -24,9 +23,11 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class MainController {
@@ -40,17 +41,11 @@ public class MainController {
     @FXML
     public GridPane gridPane;
     @FXML
-    private ComboBox<Integer> plusDays;
+    private DatePicker meetingDate;
     @FXML
     private ComboBox<String> startTime;
     @FXML
     private ComboBox<String> endTime;
-    @FXML
-    private ComboBox<String> cronDescription;
-    @FXML
-    public RadioButton multipleChoice;
-    @Resource
-    private HttpClientUtil httpClientUtil;
 
     @PreDestroy
     public void cache() {
@@ -60,14 +55,21 @@ public class MainController {
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
     private final ArrayList<String> roomIdList = new ArrayList<>();
     private final ArrayList<CheckBox> checkBoxList = new ArrayList<>();
-    private final boolean[] flag = {false, false, false, false};
+    private final boolean[] flag = {false, false, false};
 
     public void initialize() {
-
-        plusDays.setItems(FXCollections.observableArrayList(7, 6, 5, 4, 3, 2, 1, 0));
+        meetingDate.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item.isBefore(LocalDate.now())) {
+                    setStyle("-fx-background-color: #ffc0cb;");
+                    setDisable(true);
+                }
+            }
+        });
         startTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
         endTime.setItems(FXCollections.observableArrayList(Constant.TIME_LIST));
-        cronDescription.setItems(FXCollections.observableArrayList(Constant.CRON_MAP.keySet()));
         for (Map.Entry<String, String> entry : Constant.ROOM_INFO_MAP.entrySet()) {
             CheckBox checkBox = new CheckBox();
             checkBox.setText(entry.getValue());
@@ -101,7 +103,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("开启会议室助手");
         alert.setHeaderText("配置信息");
-        alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+        alert.setContentText(meetingTaskProperties.toString());
 
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
@@ -112,13 +114,14 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("暂停会议室助手");
         alert.setHeaderText("确定?");
-        alert.setContentText(meetingTaskProperties.toString() + meetingTaskProperties.mockCron());
+        alert.setContentText(meetingTaskProperties.toString());
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         ButtonType buttonType = alert.showAndWait().orElse(null);
         return Objects.equals(ButtonType.OK, buttonType);
     }
 
-    private void stopTask() {
+    @EventListener(value = Boolean.class)
+    public void stopTask() {
         ScheduledFuture<?> scheduledFuture = taskFutures.remove();
         scheduledFuture.cancel(true);
         disable(false);
@@ -126,19 +129,17 @@ public class MainController {
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
-        MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, httpClientUtil);
-        ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new CronTrigger(meetingTaskProperties.getCron()));
+        MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
+        ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new PeriodicTrigger(1, TimeUnit.MINUTES));
         taskFutures.add(schedule);
         disable(true);
         TooltipUtil.show("开启成功!");
     }
 
     private void disable(boolean disable) {
-        plusDays.setDisable(disable);
+        meetingDate.setDisable(disable);
         startTime.setDisable(disable);
         endTime.setDisable(disable);
-        cronDescription.setDisable(disable);
-        multipleChoice.setDisable(disable);
         for (CheckBox checkBox : checkBoxList) {
             checkBox.setDisable(disable);
         }
@@ -160,11 +161,9 @@ public class MainController {
 
     public boolean clear() {
         if (!isRunning()) {
-            plusDays.setValue(null);
+            meetingDate.setValue(null);
             startTime.setValue(null);
             endTime.setValue(null);
-            cronDescription.setValue(null);
-            multipleChoice.setSelected(Boolean.FALSE);
             for (CheckBox checkBox : checkBoxList) {
                 checkBox.setSelected(false);
             }
@@ -181,7 +180,7 @@ public class MainController {
     }
 
     public MeetingTaskProperties buildMeetingTaskProperties() {
-        return new MeetingTaskProperties(plusDays.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, cronDescription.getValue(), multipleChoice.isSelected());
+        return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList);
     }
 
     private void readTaskProperties() {
@@ -190,11 +189,9 @@ public class MainController {
             return;
         }
 
-        plusDays.setValue(meetingTaskProperties.getPlusDays());
+        meetingDate.setValue(meetingTaskProperties.getMeetingDate());
         startTime.setValue(meetingTaskProperties.getStartTime());
         endTime.setValue(meetingTaskProperties.getEndTime());
-        cronDescription.setValue(meetingTaskProperties.getCronDescription());
-        multipleChoice.setSelected(meetingTaskProperties.getMultipleChoice());
 
         for (String roomId : meetingTaskProperties.getRoomIdList()) {
             for (CheckBox checkBox : checkBoxList) {
@@ -234,8 +231,8 @@ public class MainController {
 
 
     private void addListener() {
-        plusDays.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            flag[0] = newValue != null && newValue >= 0 && newValue <= 7;
+        meetingDate.valueProperty().addListener((observable, oldValue, newValue) -> {
+            flag[0] = newValue != null;
             checkSubmit();
         });
 
@@ -248,20 +245,14 @@ public class MainController {
             checkSubmit();
         });
 
-        cronDescription.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String value = Constant.CRON_MAP.get(newValue);
-            flag[2] = CronSequenceGenerator.isValidExpression(value);
-            checkSubmit();
-        });
-
         for (CheckBox checkBox : checkBoxList) {
             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 roomIdList.remove(checkBox.getId());
                 if (checkBox.isSelected()) {
                     roomIdList.add(checkBox.getId());
                 }
-                flag[3] = !CollectionUtils.isEmpty(roomIdList);
-                if (!flag[3]) {
+                flag[2] = !CollectionUtils.isEmpty(roomIdList);
+                if (!flag[2]) {
                     TooltipUtil.show("至少选择一个!");
                 }
                 checkSubmit();

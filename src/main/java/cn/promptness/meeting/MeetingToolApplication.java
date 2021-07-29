@@ -36,12 +36,12 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         if (!SystemTray.isSupported()) {
             System.exit(1);
         }
-        String pid = SingleUtil.getPid();
-        String programName = SingleUtil.getProgramName(pid);
-        boolean single = SingleUtil.isSingle(programName, pid);
-        if (!single) {
-            System.exit(1);
-        }
+//        String pid = SingleUtil.getPid();
+//        String programName = SingleUtil.getProgramName(pid);
+//        boolean single = SingleUtil.isSingle(programName, pid);
+//        if (!single) {
+//            System.exit(1);
+//        }
         Application.launch(MeetingToolApplication.class, args);
     }
 
