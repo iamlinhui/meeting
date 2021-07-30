@@ -46,9 +46,11 @@ public class MeetingTask implements Runnable {
 
     private void meeting() throws Exception {
         HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
+        // 还未到预定时间
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
             return;
         }
+        // 已经过了会议室开始时间
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.checkTimeIsOk())) {
             Platform.runLater(() -> applicationContext.publishEvent(false));
             return;

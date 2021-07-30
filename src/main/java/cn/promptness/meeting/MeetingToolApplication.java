@@ -3,7 +3,6 @@ package cn.promptness.meeting;
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
-import cn.promptness.meeting.tool.utils.SingleUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -23,7 +22,6 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
-import java.io.IOException;
 
 @SpringBootApplication
 @EnableScheduling
@@ -31,15 +29,9 @@ public class MeetingToolApplication extends Application implements ApplicationLi
 
     private ConfigurableApplicationContext applicationContext;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         System.setProperty("java.awt.headless", "false");
         if (!SystemTray.isSupported()) {
-            System.exit(1);
-        }
-        String pid = SingleUtil.getPid();
-        String programName = SingleUtil.getProgramName(pid);
-        boolean single = SingleUtil.isSingle(programName, pid);
-        if (!single) {
             System.exit(1);
         }
         Application.launch(MeetingToolApplication.class, args);
