@@ -22,7 +22,7 @@
             <ComboBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
             <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
             <ComboBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
-            <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         </GridPane>
     </center>
     <Button minWidth="80" maxWidth="80" prefWidth="80" mnemonicParsing="false" disable="true" text="开启" fx:id="okButton" onAction="#submit"/>

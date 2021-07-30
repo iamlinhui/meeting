@@ -88,7 +88,7 @@ public class MainController {
         MeetingTaskProperties meetingTaskProperties = buildMeetingTaskProperties();
         if (isRunning()) {
             if (alertStop(meetingTaskProperties)) {
-                stopTask();
+                stopTask(null);
             }
             return;
         }
@@ -121,11 +121,11 @@ public class MainController {
     }
 
     @EventListener(value = Boolean.class)
-    public void stopTask() {
+    public void stopTask(Boolean success) {
         ScheduledFuture<?> scheduledFuture = taskFutures.remove();
         scheduledFuture.cancel(true);
         disable(false);
-        TooltipUtil.show("暂停成功!");
+        TooltipUtil.show(Objects.equals(success, Boolean.FALSE) ? "已经过了会议时间!" : "暂停成功!");
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
@@ -150,12 +150,12 @@ public class MainController {
         int halfSize = (checkBoxList.size() % 2 == 0 ? 0 : 1) + checkBoxList.size() / 2;
         for (int i = 0; i < checkBoxList.size(); i++) {
             if (i < halfSize) {
-                gridPane.add(checkBoxList.get(i), 1, 2 + i);
+                gridPane.add(checkBoxList.get(i), 1, 1 + i);
             } else {
-                gridPane.add(checkBoxList.get(i), 2, 2 + i - halfSize);
+                gridPane.add(checkBoxList.get(i), 2, 1 + i - halfSize);
             }
         }
-        gridPane.add(okButton, 5, 2 + halfSize - 1);
+        gridPane.add(okButton, 5, 1 + halfSize - 1);
     }
 
 

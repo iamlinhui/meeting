@@ -9,6 +9,7 @@ import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import cn.promptness.meeting.tool.utils.TooltipUtil;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import org.slf4j.Logger;
