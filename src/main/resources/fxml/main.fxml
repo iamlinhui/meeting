@@ -17,7 +17,7 @@
                 <Insets top="10" right="50" bottom="20" left="10"/>
             </padding>
             <Label text="会议日期:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-            <DatePicker minWidth="150" maxWidth="150" prefWidth="150" prefHeight="35" minHeight="35" maxHeight="35" fx:id="meetingDate" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <DatePicker minWidth="150" maxWidth="150" prefWidth="150" prefHeight="30" minHeight="30" maxHeight="30" fx:id="meetingDate" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
             <Label text="会议时间:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
             <ComboBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
             <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>

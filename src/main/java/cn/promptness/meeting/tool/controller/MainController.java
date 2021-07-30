@@ -129,6 +129,10 @@ public class MainController {
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
+        if (!meetingTaskProperties.checkTimeIsOk()) {
+            TooltipUtil.show("已经过了会议时间!");
+            return;
+        }
         MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
         ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new PeriodicTrigger(1, TimeUnit.MINUTES));
         taskFutures.add(schedule);
