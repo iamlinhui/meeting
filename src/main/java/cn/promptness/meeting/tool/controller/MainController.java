@@ -1,10 +1,10 @@
 package cn.promptness.meeting.tool.controller;
 
+import cn.promptness.meeting.tool.cache.TaskCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.collections.FXCollections;
@@ -49,7 +49,7 @@ public class MainController {
 
     @PreDestroy
     public void cache() {
-        MeetingUtil.cacheProperties(buildMeetingTaskProperties());
+        TaskCache.cache(buildMeetingTaskProperties());
     }
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
@@ -79,7 +79,7 @@ public class MainController {
 
         addListener();
         initGridPane();
-        readTaskProperties();
+        readTask();
     }
 
     @FXML
@@ -187,8 +187,8 @@ public class MainController {
         return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList);
     }
 
-    private void readTaskProperties() {
-        MeetingTaskProperties meetingTaskProperties = MeetingUtil.readProperties();
+    private void readTask() {
+        MeetingTaskProperties meetingTaskProperties = TaskCache.read();
         if (meetingTaskProperties == null) {
             return;
         }

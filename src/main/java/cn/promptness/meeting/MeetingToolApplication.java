@@ -1,8 +1,8 @@
 package cn.promptness.meeting;
 
 import cn.promptness.meeting.tool.SpringFxmlLoader;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.data.Constant;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -59,6 +59,6 @@ public class MeetingToolApplication extends Application implements ApplicationLi
 
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
-        MeetingUtil.cache();
+        AccountCache.cache();
     }
 }

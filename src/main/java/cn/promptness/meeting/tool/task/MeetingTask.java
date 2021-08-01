@@ -2,12 +2,12 @@ package cn.promptness.meeting.tool.task;
 
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.exception.MeetingException;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
@@ -35,7 +35,7 @@ public class MeetingTask implements Runnable {
 
     @Override
     public void run() {
-        if (MeetingUtil.haveAccount()) {
+        if (AccountCache.haveAccount()) {
             try {
                 this.meeting();
             } catch (Exception e) {
@@ -76,14 +76,14 @@ public class MeetingTask implements Runnable {
         paramMap.put("meeting_date", meetingTaskProperties.getMeetingDateString());
         paramMap.put("start_time", meetingTaskProperties.getStartTime());
         paramMap.put("end_time", meetingTaskProperties.getEndTime());
-        paramMap.put("meeting_person", MeetingUtil.getUid());
+        paramMap.put("meeting_person", AccountCache.getUid());
         return paramMap;
     }
 
     private List<String> filterRoomIdList(HttpClientUtil httpClientUtil) throws Exception {
         // 过滤被屏蔽的会议室
         List<String> roomIdList = new ArrayList<>();
-        HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingTaskProperties.getMeetingDateString()), MeetingUtil.getHeaderList());
+        HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingTaskProperties.getMeetingDateString()), AccountCache.getHeaderList());
         Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
         if (!response.isSuccess()) {
             throw new MeetingException(response.getMessage());
@@ -100,7 +100,7 @@ public class MeetingTask implements Runnable {
     private boolean handle(HttpClientUtil httpClientUtil, Map<String, String> paramMap, String roomId) throws Exception {
         log.info("---开始预定{}会议室---", Constant.ROOM_INFO_MAP.get(roomId));
         paramMap.put("room_id", roomId);
-        HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, MeetingUtil.getHeaderList());
+        HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, AccountCache.getHeaderList());
         Response<?> response = httpResult.getContent(Response.class);
         if (response.isSuccess()) {
             log.info("---结束发送请求---");

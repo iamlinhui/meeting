@@ -2,9 +2,9 @@ package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.controller.LoginController;
 import cn.promptness.meeting.tool.pojo.Login;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
@@ -34,10 +34,10 @@ public class CheckLoginService extends BaseService<Boolean> {
             protected Boolean call() throws Exception {
                 while (loginStage.isShowing() && loginController.isCodeSuccess()) {
                     Thread.sleep(3000);
-                    HttpResult httpResult = httpClientUtil.doGet(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", loginController.getToken(), loginController.getCurrentTimeMillis()), MeetingUtil.getHeaderList());
+                    HttpResult httpResult = httpClientUtil.doGet(String.format("https://passport.oa.fenqile.com/user/main/scan.json?token=%s&_=%s", loginController.getToken(), loginController.getCurrentTimeMillis()), AccountCache.getHeaderList());
                     Login login = httpResult.getContent(Login.class);
                     if (login.isSuccess()) {
-                        MeetingUtil.flashHeader(httpResult.getHeaderList("Set-Cookie"));
+                        AccountCache.flashHeader(httpResult.getHeaderList("Set-Cookie"));
                         return Boolean.TRUE;
                     }
                 }

@@ -1,7 +1,7 @@
 package cn.promptness.meeting.tool.task;
 
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.service.ValidateUserService;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import javafx.application.Platform;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +24,7 @@ public class ContinuationTask {
 
     @Scheduled(initialDelay = 60000, fixedRate = 60000)
     public void continuation() {
-        if (MeetingUtil.haveAccount()) {
+        if (AccountCache.haveAccount()) {
             Platform.runLater(() -> applicationContext.getBean(ValidateUserService.class).expect(null).start());
         }
     }

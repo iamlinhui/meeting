@@ -1,7 +1,7 @@
 package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import javafx.concurrent.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -30,7 +30,7 @@ public class CancelMeetingRoomService extends BaseService<Void> {
             @Override
             protected Void call() throws Exception {
                 for (String meetingId : cancelList) {
-                    httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", meetingId), MeetingUtil.getHeaderList());
+                    httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_cancel_meeting.json?meeting_id=%s", meetingId), AccountCache.getHeaderList());
                 }
                 return null;
             }

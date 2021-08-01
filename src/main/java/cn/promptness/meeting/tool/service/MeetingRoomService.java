@@ -2,6 +2,7 @@ package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
@@ -42,7 +43,7 @@ public class MeetingRoomService extends BaseService<Response<Room>> {
         return new Task<Response<Room>>() {
             @Override
             protected Response<Room> call() throws Exception {
-                HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", MeetingUtil.getHeaderList());
+                HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/query_rooms.json", AccountCache.getHeaderList());
                 return httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
             }
         };

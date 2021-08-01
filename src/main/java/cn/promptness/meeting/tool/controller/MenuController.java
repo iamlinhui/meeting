@@ -1,12 +1,12 @@
 package cn.promptness.meeting.tool.controller;
 
 import cn.promptness.meeting.tool.SpringFxmlLoader;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.fxml.FXML;
@@ -43,7 +43,7 @@ public class MenuController {
     private MainController mainController;
 
     public void initialize() {
-        MeetingUtil.readCache();
+        AccountCache.read();
         applicationContext.getBean(ValidateUserService.class).expect(event -> {
             accountAction.setText("注销");
             accountTitle.setText(event.getSource().getValue().toString());
@@ -118,7 +118,7 @@ public class MenuController {
     @FXML
     public void account() {
         // 有账户 点击时就是注销
-        if (MeetingUtil.haveAccount()) {
+        if (AccountCache.haveAccount()) {
             doLogout();
             return;
         }
@@ -156,7 +156,7 @@ public class MenuController {
     }
 
     private void doLogout() {
-        MeetingUtil.logout();
+        AccountCache.logout();
         accountAction.setText("登录");
         accountTitle.setText("账户");
     }

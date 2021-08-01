@@ -2,10 +2,10 @@ package cn.promptness.meeting.tool.service;
 
 import cn.promptness.httpclient.HttpClientUtil;
 import cn.promptness.httpclient.HttpResult;
+import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.controller.MenuController;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Session;
-import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import com.google.gson.reflect.TypeToken;
 import javafx.concurrent.Service;
@@ -32,10 +32,10 @@ public class ValidateUserService extends BaseService<String> {
         return new Task<String>() {
             @Override
             protected String call() throws Exception {
-                if (!MeetingUtil.haveAccount()) {
+                if (!AccountCache.haveAccount()) {
                     return null;
                 }
-                HttpResult httpResult = httpClientUtil.doGet("https://api.oa.fenqile.com/oa/api/user/session.json?resource_sn=NEWAPR_OA", MeetingUtil.getHeaderList());
+                HttpResult httpResult = httpClientUtil.doGet("https://api.oa.fenqile.com/oa/api/user/session.json?resource_sn=NEWAPR_OA", AccountCache.getHeaderList());
                 Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {}.getType());
                 if (response.isSuccess()) {
                     return response.getResult().stream().findFirst().orElse(new Session()).getName();
