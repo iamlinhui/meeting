@@ -14,6 +14,8 @@ import javafx.scene.layout.GridPane;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -133,7 +135,8 @@ public class MainController {
             return;
         }
         MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
-        taskFutures.add(taskScheduler.schedule(meetingTask, new PeriodicTrigger(1, TimeUnit.MINUTES)));
+        Trigger trigger = meetingTaskProperties.isEnable() ? new PeriodicTrigger(1, TimeUnit.MINUTES) : new CronTrigger("0 0/1 * * * *");
+        taskFutures.add(taskScheduler.schedule(meetingTask, trigger));
         disable(true);
         TooltipUtil.show("开启成功!");
     }
