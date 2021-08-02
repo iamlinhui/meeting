@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,15 +54,13 @@ public class LoggerAspect {
         String cookie = gson.toJson(cookieMap);
         String param = gson.toJson(params);
         if (result instanceof HttpResult) {
-            HashMap<String, String> headerMap = new HashMap<>(16);
+            List<String> setCookieList = new ArrayList<>(16);
             HttpResult httpResult = (HttpResult) result;
             List<Header> headerList = httpResult.getHeaderList("Set-Cookie");
             for (Header header : headerList) {
-                String value = header.getValue();
-                String cookieString = value.split(";")[0];
-                headerMap.put(cookieString.split("=")[0], cookieString.split("=")[1]);
+                setCookieList.add(header.getValue());
             }
-            String setCookie = gson.toJson(headerMap);
+            String setCookie = gson.toJson(setCookieList);
             log.debug("请求路径:{},入参:{},Cookie:{},出参:{},Set-Cookie:{}", url, param, cookie, httpResult.getMessage(), setCookie);
         }
     }
