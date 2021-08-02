@@ -49,7 +49,7 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Style.LIGHT.getStyleStylesheetURL());
-        primaryStage.setTitle(Constant.TITLE + " - Powered By Lynn");
+        primaryStage.setTitle(Constant.TITLE);
         primaryStage.getIcons().add(new Image("/icon.png"));
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
