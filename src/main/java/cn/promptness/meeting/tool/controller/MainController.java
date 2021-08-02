@@ -79,7 +79,7 @@ public class MainController {
 
         addListener();
         initGridPane();
-        readTask();
+        initTask();
     }
 
     @FXML
@@ -88,7 +88,7 @@ public class MainController {
         MeetingTaskProperties meetingTaskProperties = buildMeetingTaskProperties();
         if (isRunning()) {
             if (alertStop(meetingTaskProperties)) {
-                stopTask(null);
+                stopTask(true);
             }
             return;
         }
@@ -122,8 +122,7 @@ public class MainController {
 
     @EventListener(value = Boolean.class)
     public void stopTask(Boolean success) {
-        ScheduledFuture<?> scheduledFuture = taskFutures.remove();
-        scheduledFuture.cancel(true);
+        taskFutures.remove().cancel(true);
         disable(false);
         TooltipUtil.show(Objects.equals(success, Boolean.FALSE) ? "已经过了会议时间!" : "暂停成功!");
     }
@@ -134,8 +133,7 @@ public class MainController {
             return;
         }
         MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
-        ScheduledFuture<?> schedule = taskScheduler.schedule(meetingTask, new PeriodicTrigger(1, TimeUnit.MINUTES));
-        taskFutures.add(schedule);
+        taskFutures.add(taskScheduler.schedule(meetingTask, new PeriodicTrigger(1, TimeUnit.MINUTES)));
         disable(true);
         TooltipUtil.show("开启成功!");
     }
@@ -187,7 +185,7 @@ public class MainController {
         return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList);
     }
 
-    private void readTask() {
+    private void initTask() {
         MeetingTaskProperties meetingTaskProperties = TaskCache.read();
         if (meetingTaskProperties == null) {
             return;
