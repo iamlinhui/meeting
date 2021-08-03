@@ -9,7 +9,6 @@ import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,7 +24,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 
 @Controller
 public class MenuController {
@@ -108,7 +106,7 @@ public class MenuController {
     }
 
     @FXML
-    public void add() throws IOException {
+    public void add() {
         mainController.add();
     }
 

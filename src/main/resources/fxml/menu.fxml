@@ -4,8 +4,8 @@
 <MenuBar fx:controller="cn.promptness.meeting.tool.controller.MenuController" xmlns="http://javafx.com/javafx/8"
          xmlns:fx="http://javafx.com/fxml/1">
     <Menu text="编辑">
-        <MenuItem text="重置" onAction="#clear"/>
         <MenuItem text="增加" onAction="#add"/>
+        <MenuItem text="重置" onAction="#clear"/>
     </Menu>
     <Menu text="查看">
         <MenuItem text="状态" onAction="#show"/>

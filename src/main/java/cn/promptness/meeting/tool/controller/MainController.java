@@ -11,7 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,26 +24,33 @@ public class MainController {
 
     private final Map<Integer, TaskController> taskMap = new ConcurrentHashMap<>();
 
-    public void initialize() throws IOException {
+    public void initialize() {
         add();
     }
 
-    public void add() throws IOException {
+    public void add() {
         FXMLLoader loader = springFxmlLoader.getLoader("/fxml/task.fxml");
-        Parent load = loader.load();
+        Parent load = springFxmlLoader.load(loader);
         TaskController taskController = loader.getController();
         taskMap.put(taskController.getTarget(), taskController);
+        Tab tab = this.buildTab(load, taskController);
+        tabPane.getTabs().add(tab);
+        tabPane.getSelectionModel().select(tab);
+        tabPane.setTabClosingPolicy(tabPane.getTabs().size() > 1 ? TabPane.TabClosingPolicy.SELECTED_TAB : TabPane.TabClosingPolicy.UNAVAILABLE);
+    }
+
+    private Tab buildTab(Parent load, TaskController taskController) {
         Tab tab = new Tab("执行面板", load);
         tab.setId(String.valueOf(taskController.getTarget()));
         tab.setOnCloseRequest(event -> {
-            boolean close = taskController.close();
-            if (!close) {
+            if (!taskController.close()) {
                 event.consume();
+                return;
             }
             taskMap.remove(taskController.getTarget());
         });
-        tabPane.getTabs().add(tab);
-
+        tab.setOnClosed(event -> tabPane.setTabClosingPolicy(tabPane.getTabs().size() == 1 ? TabPane.TabClosingPolicy.UNAVAILABLE : TabPane.TabClosingPolicy.SELECTED_TAB));
+        return tab;
     }
 
     @EventListener(value = TaskEvent.class)

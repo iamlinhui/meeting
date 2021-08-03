@@ -39,4 +39,13 @@ public final class SpringFxmlLoader {
         return new Pane();
     }
 
+    public Parent load(FXMLLoader fxmlLoader) {
+        try {
+            return fxmlLoader.load();
+        } catch (IOException ignored) {
+
+        }
+        return new Pane();
+    }
+
 }
