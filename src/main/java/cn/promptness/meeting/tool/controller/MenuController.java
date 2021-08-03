@@ -107,7 +107,7 @@ public class MenuController {
 
     @FXML
     public void add() {
-        mainController.add();
+        mainController.addTab();
     }
 
     @FXML

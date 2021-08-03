@@ -30,10 +30,10 @@ public class MainController {
     private final Map<Integer, TaskController> taskMap = new ConcurrentHashMap<>();
 
     public void initialize() {
-        add();
+        addTab();
     }
 
-    public void add() {
+    public void addTab() {
         FXMLLoader loader = springFxmlLoader.getLoader("/fxml/task.fxml");
         Parent load = springFxmlLoader.load(loader);
         TaskController taskController = loader.getController();
