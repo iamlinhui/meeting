@@ -19,12 +19,14 @@ public class MeetingTaskProperties implements Serializable {
     private final String startTime;
     private final String endTime;
     private final List<String> roomIdList;
+    private final Integer target;
 
-    public MeetingTaskProperties(LocalDate meetingDate, String startTime, String endTime, List<String> roomIdList) {
+    public MeetingTaskProperties(LocalDate meetingDate, String startTime, String endTime, List<String> roomIdList, Integer target) {
         this.meetingDate = meetingDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.roomIdList = roomIdList;
+        this.target = target;
     }
 
     @Override
@@ -52,6 +54,10 @@ public class MeetingTaskProperties implements Serializable {
 
     public List<String> getRoomIdList() {
         return roomIdList;
+    }
+
+    public Integer getTarget() {
+        return target;
     }
 
     public boolean isEnable() {

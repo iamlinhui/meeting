@@ -9,6 +9,7 @@ import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,6 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @Controller
 public class MenuController {
@@ -40,7 +42,7 @@ public class MenuController {
     @Resource
     private SpringFxmlLoader springFxmlLoader;
     @Resource
-    private MainController mainController;
+    private TaskController taskController;
 
     public void initialize() {
         AccountCache.read();
@@ -52,7 +54,7 @@ public class MenuController {
 
     @FXML
     public void clear() {
-        boolean clearSuccess = mainController.clear();
+        boolean clearSuccess = taskController.clear();
         if (!clearSuccess) {
             Alert alert = new Alert(Alert.AlertType.NONE);
             alert.setTitle(Constant.TITLE);
@@ -93,13 +95,13 @@ public class MenuController {
         alert.setHeaderText("运行状态");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
-        if (!mainController.isRunning()) {
+        if (!taskController.isRunning()) {
             alert.setContentText("请先开启任务!");
             alert.showAndWait();
             return;
         }
         applicationContext.getBean(ValidateUserService.class).expect(event -> {
-            MeetingTaskProperties meetingTaskProperties = mainController.buildMeetingTaskProperties();
+            MeetingTaskProperties meetingTaskProperties = taskController.buildMeetingTaskProperties();
             alert.setContentText(meetingTaskProperties.toString());
             alert.showAndWait();
         }).start();
@@ -161,4 +163,10 @@ public class MenuController {
         accountTitle.setText("账户");
     }
 
+    @Resource
+    private MainController mainController;
+    @FXML
+    public void add(ActionEvent actionEvent)  {
+        mainController.add();
+    }
 }

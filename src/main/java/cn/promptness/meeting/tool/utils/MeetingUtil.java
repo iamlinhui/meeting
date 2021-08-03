@@ -3,8 +3,11 @@ package cn.promptness.meeting.tool.utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeetingUtil {
+
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(1);
 
     public static String dateToWeek(String datetime) {
 
@@ -24,4 +27,10 @@ public class MeetingUtil {
         }
         return weekDays[w];
     }
+
+    public static Integer next() {
+        return ATOMIC_INTEGER.getAndIncrement();
+    }
+
+
 }
