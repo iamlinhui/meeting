@@ -5,7 +5,6 @@
          xmlns:fx="http://javafx.com/fxml/1">
     <Menu text="编辑">
         <MenuItem text="新增" onAction="#add"/>
-        <MenuItem text="重置" onAction="#clear"/>
         <MenuItem text="退出" onAction="#close"/>
     </Menu>
     <Menu text="查看">

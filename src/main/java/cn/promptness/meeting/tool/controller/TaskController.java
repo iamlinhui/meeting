@@ -110,7 +110,7 @@ public class TaskController {
 
     private boolean alertStart(MeetingTaskProperties meetingTaskProperties) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("开启会议室助手");
+        alert.setTitle("开启");
         alert.setHeaderText("配置信息");
         alert.setContentText(meetingTaskProperties.toString());
 
@@ -121,7 +121,7 @@ public class TaskController {
 
     private boolean alertStop(MeetingTaskProperties meetingTaskProperties) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("暂停会议室助手");
+        alert.setTitle("暂停");
         alert.setHeaderText("确定?");
         alert.setContentText(meetingTaskProperties.toString());
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
@@ -132,12 +132,12 @@ public class TaskController {
     public void stopTask(Boolean success) {
         taskFutures.remove().cancel(true);
         disable(false);
-        TooltipUtil.show(Objects.equals(success, Boolean.FALSE) ? "已经过了会议时间!" : "暂停成功!");
+        TooltipUtil.show(Objects.equals(success, Boolean.FALSE) ? "会议已经开始!" : "已关闭!");
     }
 
     private void startTask(MeetingTaskProperties meetingTaskProperties) {
         if (!meetingTaskProperties.checkTimeIsOk()) {
-            TooltipUtil.show("已经过了会议时间!");
+            TooltipUtil.show("会议已经开始!");
             return;
         }
         MeetingTask meetingTask = new MeetingTask(meetingTaskProperties, applicationContext);
@@ -167,23 +167,6 @@ public class TaskController {
             }
         }
         gridPane.add(okButton, 5, 1 + halfSize - 1);
-    }
-
-
-    public boolean clear() {
-        if (!isRunning()) {
-            meetingDate.setValue(null);
-            startTime.setValue(null);
-            endTime.setValue(null);
-            for (CheckBox checkBox : checkBoxList) {
-                checkBox.setSelected(false);
-            }
-            roomIdList.clear();
-            okButton.setDisable(true);
-            Arrays.fill(flag, false);
-            return true;
-        }
-        return false;
     }
 
     public boolean isRunning() {

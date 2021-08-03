@@ -45,7 +45,7 @@ public class MainController {
     }
 
     private Tab buildTab(Parent load, TaskController taskController) {
-        Tab tab = new Tab("执行面板", load);
+        Tab tab = new Tab("控制台", load);
         tab.setId(String.valueOf(taskController.getTarget()));
         tab.setOnCloseRequest(event -> {
             if (!taskController.isRunning()) {
@@ -65,7 +65,7 @@ public class MainController {
 
     private boolean alertClose(MeetingTaskProperties meetingTaskProperties) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("关闭当前执行面板");
+        alert.setTitle("关闭");
         alert.setHeaderText("确定?");
         alert.setContentText(meetingTaskProperties.toString());
         alert.initOwner(SystemTrayUtil.getPrimaryStage());

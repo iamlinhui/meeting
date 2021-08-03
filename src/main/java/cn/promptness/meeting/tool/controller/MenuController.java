@@ -51,20 +51,6 @@ public class MenuController {
     }
 
     @FXML
-    public void clear() {
-        boolean clearSuccess = mainController.getCurrentTask().clear();
-        if (!clearSuccess) {
-            Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle(Constant.TITLE);
-            alert.setHeaderText("重置配置");
-            alert.initOwner(SystemTrayUtil.getPrimaryStage());
-            alert.getButtonTypes().add(ButtonType.CLOSE);
-            alert.setContentText("请先暂停任务!");
-            alert.showAndWait();
-        }
-    }
-
-    @FXML
     public void about() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
@@ -90,7 +76,7 @@ public class MenuController {
     public void show() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
-        alert.setHeaderText("运行状态");
+        alert.setHeaderText("控制台状态");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
         if (!mainController.getCurrentTask().isRunning()) {
