@@ -111,6 +111,11 @@ public class MenuController {
     }
 
     @FXML
+    public void close() {
+        System.exit(0);
+    }
+
+    @FXML
     public void list() {
         applicationContext.getBean(MeetingRoomService.class).expect(event -> login()).start();
     }

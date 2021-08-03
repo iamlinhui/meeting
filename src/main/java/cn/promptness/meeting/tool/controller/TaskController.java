@@ -147,18 +147,6 @@ public class TaskController {
         TooltipUtil.show("开启成功!");
     }
 
-    public boolean close() {
-        if (!isRunning()) {
-            return true;
-        }
-        MeetingTaskProperties meetingTaskProperties = buildMeetingTaskProperties();
-        if (alertStop(meetingTaskProperties)) {
-            stopTask(true);
-            return true;
-        }
-        return false;
-    }
-
     private void disable(boolean disable) {
         meetingDate.setDisable(disable);
         startTime.setDisable(disable);
@@ -203,7 +191,7 @@ public class TaskController {
     }
 
     public MeetingTaskProperties buildMeetingTaskProperties() {
-        return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList,target);
+        return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, target);
     }
 
     private void checkTime() {
