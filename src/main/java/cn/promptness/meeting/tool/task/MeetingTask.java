@@ -6,7 +6,7 @@ import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.exception.MeetingException;
-import cn.promptness.meeting.tool.pojo.Event;
+import cn.promptness.meeting.tool.pojo.TaskEvent;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
@@ -53,7 +53,7 @@ public class MeetingTask implements Runnable {
         }
         // 已经过了会议室开始时间
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.checkTimeIsOk())) {
-            Platform.runLater(() -> applicationContext.publishEvent(new Event(meetingTaskProperties.getTarget(), false)));
+            Platform.runLater(() -> applicationContext.publishEvent(new TaskEvent(meetingTaskProperties.getTarget(), false)));
             return;
         }
         Map<String, String> paramMap = this.getParamMap();
@@ -62,7 +62,7 @@ public class MeetingTask implements Runnable {
         for (String roomId : roomIdList) {
             boolean success = this.getRetryTemplate().execute(retryContext -> this.handle(httpClientUtil, paramMap, roomId));
             if (success) {
-                Platform.runLater(() -> applicationContext.publishEvent(new Event(meetingTaskProperties.getTarget(), true)));
+                Platform.runLater(() -> applicationContext.publishEvent(new TaskEvent(meetingTaskProperties.getTarget(), true)));
                 return;
             }
         }

@@ -6,7 +6,6 @@
     <Menu text="编辑">
         <MenuItem text="重置" onAction="#clear"/>
         <MenuItem text="增加" onAction="#add"/>
-        <MenuItem text="退出" onAction="#exit"/>
     </Menu>
     <Menu text="查看">
         <MenuItem text="状态" onAction="#show"/>

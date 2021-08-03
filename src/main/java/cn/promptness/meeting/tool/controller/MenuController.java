@@ -42,7 +42,7 @@ public class MenuController {
     @Resource
     private SpringFxmlLoader springFxmlLoader;
     @Resource
-    private TaskController taskController;
+    private MainController mainController;
 
     public void initialize() {
         AccountCache.read();
@@ -54,7 +54,7 @@ public class MenuController {
 
     @FXML
     public void clear() {
-        boolean clearSuccess = taskController.clear();
+        boolean clearSuccess = mainController.getCurrentTask().clear();
         if (!clearSuccess) {
             Alert alert = new Alert(Alert.AlertType.NONE);
             alert.setTitle(Constant.TITLE);
@@ -95,21 +95,21 @@ public class MenuController {
         alert.setHeaderText("运行状态");
         alert.initOwner(SystemTrayUtil.getPrimaryStage());
         alert.getButtonTypes().add(ButtonType.CLOSE);
-        if (!taskController.isRunning()) {
+        if (!mainController.getCurrentTask().isRunning()) {
             alert.setContentText("请先开启任务!");
             alert.showAndWait();
             return;
         }
         applicationContext.getBean(ValidateUserService.class).expect(event -> {
-            MeetingTaskProperties meetingTaskProperties = taskController.buildMeetingTaskProperties();
+            MeetingTaskProperties meetingTaskProperties = mainController.getCurrentTask().buildMeetingTaskProperties();
             alert.setContentText(meetingTaskProperties.toString());
             alert.showAndWait();
         }).start();
     }
 
     @FXML
-    public void exit() {
-        System.exit(0);
+    public void add() throws IOException {
+        mainController.add();
     }
 
     @FXML
@@ -161,12 +161,5 @@ public class MenuController {
         AccountCache.logout();
         accountAction.setText("登录");
         accountTitle.setText("账户");
-    }
-
-    @Resource
-    private MainController mainController;
-    @FXML
-    public void add(ActionEvent actionEvent)  {
-        mainController.add();
     }
 }

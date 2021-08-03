@@ -1,11 +1,11 @@
 package cn.promptness.meeting.tool.pojo;
 
-public class Event {
+public class TaskEvent {
 
     private final Integer target;
     private final Boolean result;
 
-    public Event(Integer target, Boolean result) {
+    public TaskEvent(Integer target, Boolean result) {
         this.target = target;
         this.result = result;
     }

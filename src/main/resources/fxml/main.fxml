@@ -11,6 +11,6 @@
         <fx:include source="menu.fxml"/>
     </top>
     <center>
-        <TabPane fx:id="tabPane"/>
+        <TabPane fx:id="tabPane" blendMode="BLUE"/>
     </center>
 </BorderPane>

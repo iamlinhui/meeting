@@ -1,7 +1,7 @@
 package cn.promptness.meeting.tool.controller;
 
 import cn.promptness.meeting.tool.SpringFxmlLoader;
-import cn.promptness.meeting.tool.pojo.Event;
+import cn.promptness.meeting.tool.pojo.TaskEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,26 +23,36 @@ public class MainController {
     @Resource
     private SpringFxmlLoader springFxmlLoader;
 
-    private final Map<Integer, TaskController> TASK_MAP = new ConcurrentHashMap<>();
+    private final Map<Integer, TaskController> taskMap = new ConcurrentHashMap<>();
 
-    public void initialize() {
+    public void initialize() throws IOException {
         add();
     }
 
-    public void add() {
-        try {
-            FXMLLoader loader = springFxmlLoader.getLoader("/fxml/task.fxml");
-            Parent load = loader.load();
-            TaskController taskController = loader.getController();
-            TASK_MAP.put(taskController.getTarget(), taskController);
-            tabPane.getTabs().add(new Tab(String.valueOf(taskController.getTarget()), load));
-        } catch (IOException ignored) {
+    public void add() throws IOException {
+        FXMLLoader loader = springFxmlLoader.getLoader("/fxml/task.fxml");
+        Parent load = loader.load();
+        TaskController taskController = loader.getController();
+        taskMap.put(taskController.getTarget(), taskController);
+        Tab tab = new Tab("执行面板", load);
+        tab.setId(String.valueOf(taskController.getTarget()));
+        tab.setOnCloseRequest(event -> {
+            boolean close = taskController.close();
+            if (!close) {
+                event.consume();
+            }
+            taskMap.remove(taskController.getTarget());
+        });
+        tabPane.getTabs().add(tab);
 
-        }
     }
 
-    @EventListener(value = Event.class)
-    public void stopTask(Event event) {
-        TASK_MAP.get(event.getTarget()).stopTask(event.getResult());
+    @EventListener(value = TaskEvent.class)
+    public void stopTask(TaskEvent taskEvent) {
+        taskMap.get(taskEvent.getTarget()).stopTask(taskEvent.getResult());
+    }
+
+    public TaskController getCurrentTask() {
+        return taskMap.get(Integer.valueOf(tabPane.getSelectionModel().getSelectedItem().getId()));
     }
 }

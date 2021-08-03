@@ -147,6 +147,18 @@ public class TaskController {
         TooltipUtil.show("开启成功!");
     }
 
+    public boolean close() {
+        if (!isRunning()) {
+            return true;
+        }
+        MeetingTaskProperties meetingTaskProperties = buildMeetingTaskProperties();
+        if (alertStop(meetingTaskProperties)) {
+            stopTask(true);
+            return true;
+        }
+        return false;
+    }
+
     private void disable(boolean disable) {
         meetingDate.setDisable(disable);
         startTime.setDisable(disable);
