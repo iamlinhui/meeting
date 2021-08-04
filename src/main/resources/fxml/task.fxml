@@ -4,16 +4,19 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns="http://javafx.com/javafx/8"
-          xmlns:fx="http://javafx.com/fxml/1" hgap="10" vgap="10" fx:id="gridPane" fx:controller="cn.promptness.meeting.tool.controller.TaskController">
-    <padding>
-        <Insets top="10" right="50" bottom="20" left="10"/>
-    </padding>
-    <Label text="会议日期:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <DatePicker minWidth="150" maxWidth="150" prefWidth="150" prefHeight="30" minHeight="30" maxHeight="30" fx:id="meetingDate" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-    <Label text="会议时间:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-    <ComboBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-    <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
-    <ComboBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
-    <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-</GridPane>
+<Pane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cn.promptness.meeting.tool.controller.TaskController">
+    <GridPane hgap="10" vgap="10" fx:id="gridPane">
+        <padding>
+            <Insets top="10" right="50" bottom="20" left="10"/>
+        </padding>
+        <Label text="会议日期:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <DatePicker minWidth="150" maxWidth="150" prefWidth="150" prefHeight="30" minHeight="30" maxHeight="30" fx:id="meetingDate" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <Label text="会议时间:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="startTime" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+        <Label text="~" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="endTime" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
+        <Label text="预定列表:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    </GridPane>
+    <Button fx:id="okButton" minWidth="80" maxWidth="80" prefWidth="80" onAction="#submit" mnemonicParsing="false" disable="true">开启</Button>
+</Pane>

@@ -26,7 +26,10 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +37,11 @@ import java.util.concurrent.TimeUnit;
 @Controller
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TaskController {
+
+    /**
+     * 当前task编号
+     */
+    private final Integer target = MeetingUtil.next();
 
     @Resource
     private TaskScheduler taskScheduler;
@@ -47,9 +55,8 @@ public class TaskController {
     private ComboBox<String> startTime;
     @FXML
     private ComboBox<String> endTime;
+    @FXML
     private Button okButton;
-    private Integer target;
-
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
     private final ArrayList<String> roomIdList = new ArrayList<>();
@@ -57,17 +64,6 @@ public class TaskController {
     private final boolean[] flag = {false, false, false};
 
     public void initialize() {
-
-        target = MeetingUtil.next();
-
-        okButton = new Button("开启");
-        okButton.setMinWidth(80);
-        okButton.setMaxWidth(80);
-        okButton.setPrefWidth(80);
-        okButton.setDisable(true);
-        okButton.setMnemonicParsing(false);
-        okButton.setOnAction(event -> submit());
-
         meetingDate.setDayCellFactory(param -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
@@ -166,7 +162,7 @@ public class TaskController {
                 gridPane.add(checkBoxList.get(i), 2, 1 + i - halfSize);
             }
         }
-        gridPane.add(okButton, 5, 1 + halfSize - 1);
+        gridPane.add(okButton, 5, halfSize);
     }
 
     public boolean isRunning() {
