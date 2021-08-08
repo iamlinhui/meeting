@@ -7,6 +7,7 @@ import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.CheckLoginService;
 import cn.promptness.meeting.tool.service.MeetingRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
+import cn.promptness.meeting.tool.utils.ProgressUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.fxml.FXML;
@@ -103,7 +104,7 @@ public class MenuController {
 
     @FXML
     public void list() {
-        applicationContext.getBean(MeetingRoomService.class).expect(event -> login()).start();
+        ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), applicationContext.getBean(MeetingRoomService.class).expect(event -> login())).show();
     }
 
     @FXML

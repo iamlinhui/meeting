@@ -2,6 +2,8 @@ package cn.promptness.meeting.tool.utils;
 
 
 import javafx.concurrent.Service;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -90,6 +92,12 @@ public class ProgressUtil {
         stage.setY(y);
 
         // close if work finish
-        work.setOnSucceeded(e -> stage.close());
+        EventHandler<WorkerStateEvent> onSucceeded = work.getOnSucceeded();
+        work.setOnSucceeded(e -> {
+            stage.close();
+            if (onSucceeded != null) {
+                onSucceeded.handle(e);
+            }
+        });
     }
 }
