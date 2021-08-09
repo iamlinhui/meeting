@@ -6,6 +6,7 @@ import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.exception.MeetingException;
+import cn.promptness.meeting.tool.pojo.RoomTime;
 import cn.promptness.meeting.tool.pojo.TaskEvent;
 import cn.promptness.meeting.tool.pojo.Response;
 import cn.promptness.meeting.tool.pojo.Room;
@@ -82,20 +83,30 @@ public class MeetingTask implements Runnable {
     }
 
     private List<String> filterRoomIdList(HttpClientUtil httpClientUtil) throws Exception {
-        // 过滤被屏蔽的会议室
-        List<String> roomIdList = new ArrayList<>();
         HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingTaskProperties.getMeetingDateString()), AccountCache.getHeaderList());
         Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
         if (!response.isSuccess()) {
             throw new MeetingException(response.getMessage());
         }
-        List<Integer> menuRoomList = response.getResult().stream().map(Room::getRoomId).collect(Collectors.toList());
-        for (String roomId : meetingTaskProperties.getRoomIdList()) {
-            if (menuRoomList.contains(Integer.valueOf(roomId))) {
-                roomIdList.add(roomId);
+        return response.getResult().stream().filter(this::filterRoom).filter(this::filterTime).map(Room::getRoomId).collect(Collectors.toList());
+    }
+
+    private boolean filterTime(Room room) {
+        List<RoomTime> roomTimeList = room.getTime();
+        int startTimeIndex = Constant.TIME_LIST.indexOf(meetingTaskProperties.getStartTime());
+        int endTimeIndex = Constant.TIME_LIST.indexOf(meetingTaskProperties.getEndTime());
+        for (int i = startTimeIndex; i < endTimeIndex; i++) {
+            RoomTime roomTime = roomTimeList.get(i);
+            if (roomTime.getFlag() == 0) {
+                return false;
             }
         }
-        return roomIdList;
+        return true;
+    }
+
+    private boolean filterRoom(Room room) {
+        // 过滤被屏蔽的会议室
+        return meetingTaskProperties.getRoomIdList().contains(room.getRoomId());
     }
 
     private boolean handle(HttpClientUtil httpClientUtil, Map<String, String> paramMap, String roomId) throws Exception {

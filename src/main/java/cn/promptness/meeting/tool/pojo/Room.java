@@ -2,6 +2,7 @@ package cn.promptness.meeting.tool.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Room {
@@ -20,7 +21,8 @@ public class Room {
     @SerializedName("room_name")
     private String roomName;
     @SerializedName("room_id")
-    private Integer roomId;
+    private String roomId;
+    private List<RoomTime> time;
 
 
     public String getMeetingDate() {
@@ -71,12 +73,20 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public Integer getRoomId() {
+    public String getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(Integer roomId) {
+    public void setRoomId(String roomId) {
         this.roomId = roomId;
+    }
+
+    public List<RoomTime> getTime() {
+        return time;
+    }
+
+    public void setTime(List<RoomTime> time) {
+        this.time = time;
     }
 
     @Override
@@ -88,11 +98,11 @@ public class Room {
             return false;
         }
         Room room = (Room) o;
-        return Objects.equals(meetingDate, room.meetingDate) && Objects.equals(meetingId, room.meetingId) && Objects.equals(startTime, room.startTime) && Objects.equals(endTime, room.endTime) && Objects.equals(floor, room.floor) && Objects.equals(roomName, room.roomName) && Objects.equals(roomId, room.roomId);
+        return Objects.equals(meetingDate, room.meetingDate) && Objects.equals(meetingId, room.meetingId) && Objects.equals(startTime, room.startTime) && Objects.equals(endTime, room.endTime) && Objects.equals(floor, room.floor) && Objects.equals(roomName, room.roomName) && Objects.equals(roomId, room.roomId) && Objects.equals(time, room.time);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(meetingDate, meetingId, startTime, endTime, floor, roomName, roomId);
+        return Objects.hash(meetingDate, meetingId, startTime, endTime, floor, roomName, roomId, time);
     }
 }
