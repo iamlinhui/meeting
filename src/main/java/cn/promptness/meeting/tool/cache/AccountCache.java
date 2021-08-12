@@ -3,6 +3,8 @@ package cn.promptness.meeting.tool.cache;
 import org.apache.http.Header;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.io.*;
@@ -12,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountCache {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountCache.class);
 
     private static final String ACCOUNT_FILE = "account.dat";
 
@@ -26,22 +30,14 @@ public class AccountCache {
                     BasicClientCookie2 cookie = (BasicClientCookie2) object;
                     HEADER_MAP.put(cookie.getName(), cookie.getValue());
                 }
-            } catch (Exception ignored) {
-
-            } finally {
-                account.delete();
+            } catch (IOException | ClassNotFoundException e) {
+                log.error(e.getMessage());
             }
         }
     }
 
     public static void cache() {
         File account = new File(ACCOUNT_FILE);
-        if (CollectionUtils.isEmpty(HEADER_MAP)) {
-            return;
-        }
-        if (account.exists()) {
-            account.delete();
-        }
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(account))) {
             for (Map.Entry<String, String> entry : HEADER_MAP.entrySet()) {
                 BasicClientCookie2 cookie = new BasicClientCookie2(entry.getKey(), entry.getValue());
@@ -49,8 +45,8 @@ public class AccountCache {
             }
             oos.writeObject(null);
             oos.flush();
-        } catch (Exception ignored) {
-
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
     }
 
