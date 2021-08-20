@@ -16,6 +16,8 @@ import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.retry.RecoveryCallback;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -61,7 +63,7 @@ public class MeetingTask implements Runnable {
         // 获取菜单 很容易获取不到数据加载重试机制
         List<String> roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
         for (String roomId : roomIdList) {
-            boolean success = this.getRetryTemplate().execute(retryContext -> this.handle(httpClientUtil, paramMap, roomId));
+            boolean success = this.getRetryTemplate().execute(retryContext -> this.handle(httpClientUtil, paramMap, roomId), recoveryCallback -> false);
             if (success) {
                 Platform.runLater(() -> applicationContext.publishEvent(new TaskEvent(meetingTaskProperties.getTarget(), true)));
                 return;
@@ -83,6 +85,7 @@ public class MeetingTask implements Runnable {
     }
 
     private List<String> filterRoomIdList(HttpClientUtil httpClientUtil) throws Exception {
+        log.info("---开始过滤{}会议室{}~{}---", meetingTaskProperties.getMeetingDate(), meetingTaskProperties.getStartTime(), meetingTaskProperties.getEndTime());
         HttpResult httpResult = httpClientUtil.doGet(String.format("https://m.oa.fenqile.com/restful/get/meeting/meeting_room_address_room.json?address=中国储能大厦&meeting_date=%s", meetingTaskProperties.getMeetingDateString()), AccountCache.getHeaderList());
         Response<Room> response = httpResult.getContent(new TypeToken<Response<Room>>() {}.getType());
         if (!response.isSuccess()) {
@@ -110,7 +113,7 @@ public class MeetingTask implements Runnable {
     }
 
     private boolean handle(HttpClientUtil httpClientUtil, Map<String, String> paramMap, String roomId) throws Exception {
-        log.info("---开始预定{}会议室---", Constant.ROOM_INFO_MAP.get(roomId));
+        log.info("---开始预定{}会议室{} {}~{}---", Constant.ROOM_INFO_MAP.get(roomId), meetingTaskProperties.getMeetingDate(), meetingTaskProperties.getStartTime(), meetingTaskProperties.getEndTime());
         paramMap.put("room_id", roomId);
         HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, AccountCache.getHeaderList());
         Response<?> response = httpResult.getContent(Response.class);
