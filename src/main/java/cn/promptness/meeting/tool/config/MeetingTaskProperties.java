@@ -61,10 +61,10 @@ public class MeetingTaskProperties implements Serializable {
     }
 
     public boolean isEnable() {
-        LocalDate now = LocalDate.now();
-        LocalDate handleDate = meetingDate.plusDays(-7);
+        // 会议室可提前7天在MOA预定，预定时间由凌晨0点释放改为早上10:00释放
+        LocalDateTime handleDateTime = meetingDate.plusDays(-7).atTime(LocalTime.of(10, 0));
         // 能预定的日期
-        return !now.isBefore(handleDate);
+        return !LocalDateTime.now().isBefore(handleDateTime);
     }
 
     public boolean checkTimeIsOk() {
