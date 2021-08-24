@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeetingUtil {
 
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(1);
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
 
     public static String dateToWeek(String datetime) {
 

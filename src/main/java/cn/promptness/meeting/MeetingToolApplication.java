@@ -2,6 +2,7 @@ package cn.promptness.meeting;
 
 import cn.promptness.meeting.tool.SpringFxmlLoader;
 import cn.promptness.meeting.tool.cache.AccountCache;
+import cn.promptness.meeting.tool.cache.TaskCache;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import javafx.application.Application;
@@ -38,6 +39,7 @@ public class MeetingToolApplication extends Application implements ApplicationLi
 
     @Override
     public void init() {
+        TaskCache.read();
         applicationContext = new SpringApplicationBuilder().sources(MeetingToolApplication.class).bannerMode(Banner.Mode.OFF).web(WebApplicationType.NONE).run(getParameters().getRaw().toArray(new String[0]));
     }
 

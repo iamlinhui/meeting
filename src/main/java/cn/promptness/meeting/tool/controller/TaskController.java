@@ -1,5 +1,6 @@
 package cn.promptness.meeting.tool.controller;
 
+import cn.promptness.meeting.tool.cache.TaskCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.ValidateUserService;
@@ -7,6 +8,7 @@ import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -85,6 +87,7 @@ public class TaskController {
 
         addListener();
         initGridPane();
+        initTask();
     }
 
     @FXML
@@ -170,7 +173,7 @@ public class TaskController {
     }
 
     public MeetingTaskProperties buildMeetingTaskProperties() {
-        return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, target);
+        return new MeetingTaskProperties(meetingDate.getValue(), startTime.getValue(), endTime.getValue(), roomIdList, target, isRunning());
     }
 
     private void checkTime() {
@@ -227,6 +230,28 @@ public class TaskController {
                 }
                 checkSubmit();
             });
+        }
+    }
+
+    private void initTask() {
+        MeetingTaskProperties meetingTaskProperties = TaskCache.getMeetingTaskProperties(getTarget());
+        if (meetingTaskProperties == null) {
+            return;
+        }
+        meetingDate.setValue(meetingTaskProperties.getMeetingDate());
+        startTime.setValue(meetingTaskProperties.getStartTime());
+        endTime.setValue(meetingTaskProperties.getEndTime());
+
+        for (String roomId : meetingTaskProperties.getRoomIdList()) {
+            for (CheckBox checkBox : checkBoxList) {
+                if (Objects.equals(roomId, checkBox.getId())) {
+                    // 这里会自动触发监听函数
+                    checkBox.setSelected(true);
+                }
+            }
+        }
+        if (Objects.equals(Boolean.TRUE, meetingTaskProperties.getRunning())) {
+            Platform.runLater(() -> startTask(meetingTaskProperties));
         }
     }
 
