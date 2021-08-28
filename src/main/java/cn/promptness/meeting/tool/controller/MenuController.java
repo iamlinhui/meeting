@@ -10,6 +10,7 @@ import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.ProgressUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,6 +22,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
@@ -151,5 +154,11 @@ public class MenuController {
         AccountCache.logout();
         accountAction.setText("登录");
         accountTitle.setText("账户");
+    }
+
+    public void logger(ActionEvent actionEvent) {
+        MenuItem menuItem = (MenuItem) actionEvent.getSource();
+        LoggingSystem system = LoggingSystem.get(LoggingSystem.class.getClassLoader());
+        system.setLogLevel("cn.promptness.meeting", LogLevel.valueOf(menuItem.getText().toUpperCase()));
     }
 }

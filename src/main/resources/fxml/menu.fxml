@@ -4,16 +4,25 @@
 <MenuBar fx:controller="cn.promptness.meeting.tool.controller.MenuController" xmlns="http://javafx.com/javafx/8"
          xmlns:fx="http://javafx.com/fxml/1">
     <Menu text="编辑">
-        <MenuItem text="新增" onAction="#add"/>
-        <MenuItem text="退出" onAction="#close"/>
+        <MenuItem text="新增" onAction="#add" accelerator="CTRL+N"/>
+        <MenuItem text="退出" onAction="#close" accelerator="ALT+F4"/>
     </Menu>
     <Menu text="查看">
-        <MenuItem text="状态" onAction="#show"/>
-        <MenuItem text="列表" onAction="#list"/>
+        <MenuItem text="状态" onAction="#show" accelerator="CTRL+S"/>
+        <MenuItem text="列表" onAction="#list" accelerator="CTRL+L"/>
     </Menu>
     <Menu text="帮助">
         <MenuItem text="说明" onAction="#instruction"/>
         <MenuItem text="关于" onAction="#about"/>
+        <Menu text="日志">
+            <fx:define>
+                <ToggleGroup fx:id="toggleGroup"/>
+            </fx:define>
+            <RadioMenuItem toggleGroup="$toggleGroup" text="DEBUG" onAction="#logger"/>
+            <RadioMenuItem toggleGroup="$toggleGroup" text="INFO" onAction="#logger" selected="true"/>
+            <RadioMenuItem toggleGroup="$toggleGroup" text="WARN" onAction="#logger"/>
+            <RadioMenuItem toggleGroup="$toggleGroup" text="ERROR" onAction="#logger"/>
+        </Menu>
     </Menu>
     <Menu text="账户" fx:id="accountTitle">
         <MenuItem text="登录" onAction="#account" fx:id="accountAction"/>
