@@ -57,6 +57,7 @@ public class MeetingToolApplication extends Application implements ApplicationLi
         primaryStage.setResizable(false);
         primaryStage.show();
         SystemTrayUtil.systemTray(primaryStage, Constant.TITLE);
+        applicationContext.publishEvent(this.getClass());
     }
 
     @Override

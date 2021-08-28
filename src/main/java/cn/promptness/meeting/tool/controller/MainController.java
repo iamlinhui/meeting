@@ -5,6 +5,7 @@ import cn.promptness.meeting.tool.cache.TaskCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.pojo.TaskEvent;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,6 +13,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 
@@ -91,5 +94,20 @@ public class MainController {
 
     public TaskController getCurrentTask() {
         return taskMap.get(Integer.valueOf(tabPane.getSelectionModel().getSelectedItem().getId()));
+    }
+
+    @EventListener(value = Class.class)
+    public void addCtrlClose() {
+        SystemTrayUtil.getPrimaryStage().getScene().getAccelerators().put(
+                new KeyCodeCombination(KeyCode.W, KeyCodeCombination.CONTROL_DOWN),
+                () -> {
+                    if (tabPane.getTabs().size() > 1) {
+                        TabPaneBehavior tabPaneBehavior = new TabPaneBehavior(tabPane);
+                        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+                        if (tabPaneBehavior.canCloseTab(selectedTab)) {
+                            tabPaneBehavior.closeTab(selectedTab);
+                        }
+                    }
+                });
     }
 }
