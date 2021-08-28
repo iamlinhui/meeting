@@ -156,6 +156,7 @@ public class MenuController {
         accountTitle.setText("账户");
     }
 
+    @FXML
     public void logger(ActionEvent actionEvent) {
         MenuItem menuItem = (MenuItem) actionEvent.getSource();
         LoggingSystem system = LoggingSystem.get(LoggingSystem.class.getClassLoader());

@@ -20,8 +20,6 @@
             </fx:define>
             <RadioMenuItem toggleGroup="$toggleGroup" text="DEBUG" onAction="#logger"/>
             <RadioMenuItem toggleGroup="$toggleGroup" text="INFO" onAction="#logger" selected="true"/>
-            <RadioMenuItem toggleGroup="$toggleGroup" text="WARN" onAction="#logger"/>
-            <RadioMenuItem toggleGroup="$toggleGroup" text="ERROR" onAction="#logger"/>
         </Menu>
     </Menu>
     <Menu text="账户" fx:id="accountTitle">
