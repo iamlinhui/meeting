@@ -4,12 +4,12 @@
 <MenuBar fx:controller="cn.promptness.meeting.tool.controller.MenuController" xmlns="http://javafx.com/javafx/8"
          xmlns:fx="http://javafx.com/fxml/1">
     <Menu text="编辑">
-        <MenuItem text="新增" onAction="#add" accelerator="CTRL+N"/>
-        <MenuItem text="退出" onAction="#close" accelerator="ALT+F4"/>
+        <MenuItem text="新增" onAction="#add" accelerator="Shortcut+N"/>
+        <MenuItem text="退出" onAction="#close" accelerator="Shortcut+Q"/>
     </Menu>
     <Menu text="查看">
-        <MenuItem text="状态" onAction="#show" accelerator="CTRL+S"/>
-        <MenuItem text="列表" onAction="#list" accelerator="CTRL+L"/>
+        <MenuItem text="状态" onAction="#show" accelerator="Shortcut+S"/>
+        <MenuItem text="列表" onAction="#list" accelerator="Shortcut+L"/>
     </Menu>
     <Menu text="帮助">
         <MenuItem text="说明" onAction="#instruction"/>

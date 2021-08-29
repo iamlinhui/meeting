@@ -6,6 +6,7 @@ import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.pojo.TaskEvent;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
+import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -98,11 +99,12 @@ public class MainController {
 
     @EventListener(value = Class.class)
     public void addCtrlClose() {
+        // SHORTCUT在windows会处理成ctrl,在苹果上会处理成Command
         SystemTrayUtil.getPrimaryStage().getScene().getAccelerators().put(
-                new KeyCodeCombination(KeyCode.W, KeyCodeCombination.CONTROL_DOWN),
+                new KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN),
                 () -> {
                     if (tabPane.getTabs().size() > 1) {
-                        TabPaneBehavior tabPaneBehavior = new TabPaneBehavior(tabPane);
+                        TabPaneBehavior tabPaneBehavior = ((TabPaneSkin) tabPane.getSkin()).getBehavior();
                         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
                         if (tabPaneBehavior.canCloseTab(selectedTab)) {
                             tabPaneBehavior.closeTab(selectedTab);
