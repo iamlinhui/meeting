@@ -1,11 +1,11 @@
 ```text
 init-method="init"
-    ËµÃ÷ÔÚ´´½¨Íê¶ÔÏóºó£¬Á¢¿ÌÖ´ÐÐinit·½·¨£¬ÓÃÀ´½øÐÐ³õÊ¼»¯
+    è¯´æ˜Žåœ¨åˆ›å»ºå®Œå¯¹è±¡åŽï¼Œç«‹åˆ»æ‰§è¡Œinitæ–¹æ³•ï¼Œç”¨æ¥è¿›è¡Œåˆå§‹åŒ–
 destroy-method="destroy"
-    µ±¸ÃbeanÎªµ¥ÀýÄ£Ê½£¬²ÅÄÜµ÷ÓÃ¸Ã·½·¨ destroy·½·¨ÔÚÈÝÆ÷Ïú»ÙµÄÊ±ºò±»µ÷ÓÃ
-    µ±¸ÃbeanÎª¶àÀýÊ±£¬springÈÝÆ÷²»¸ºÔðÈÝÆ÷µÄÏú»Ù¹¤×÷
-    Èç¹û¸ÃbeanÎª¶àÀýÊ±£¬µ±²»ÓÃ¸ÃbeanÊ±Ó¦¸ÃÊÖ¶¯µÄÏú»Ù
+    å½“è¯¥beanä¸ºå•ä¾‹æ¨¡å¼ï¼Œæ‰èƒ½è°ƒç”¨è¯¥æ–¹æ³• destroyæ–¹æ³•åœ¨å®¹å™¨é”€æ¯çš„æ—¶å€™è¢«è°ƒç”¨
+    å½“è¯¥beanä¸ºå¤šä¾‹æ—¶ï¼Œspringå®¹å™¨ä¸è´Ÿè´£å®¹å™¨çš„é”€æ¯å·¥ä½œ
+    å¦‚æžœè¯¥beanä¸ºå¤šä¾‹æ—¶ï¼Œå½“ä¸ç”¨è¯¥beanæ—¶åº”è¯¥æ‰‹åŠ¨çš„é”€æ¯
     
-BeanÔÚÊµÀý»¯µÄ¹ý³ÌÖÐ£ºConstructor > @PostConstruct >InitializingBean > init-method
-BeanÔÚÏú»ÙµÄ¹ý³ÌÖÐ£º@PreDestroy > DisposableBean > destroy-method
+Beanåœ¨å®žä¾‹åŒ–çš„è¿‡ç¨‹ä¸­ï¼šConstructor > @PostConstruct >InitializingBean > init-method
+Beanåœ¨é”€æ¯çš„è¿‡ç¨‹ä¸­ï¼š@PreDestroy > DisposableBean > destroy-method
 ```
