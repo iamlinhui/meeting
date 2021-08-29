@@ -16,6 +16,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 
@@ -101,7 +102,7 @@ public class MainController {
     public void addCtrlClose() {
         // SHORTCUT在windows会处理成ctrl,在苹果上会处理成Command
         SystemTrayUtil.getPrimaryStage().getScene().getAccelerators().put(
-                new KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN),
+                new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
                 () -> {
                     if (tabPane.getTabs().size() > 1) {
                         TabPaneBehavior tabPaneBehavior = ((TabPaneSkin) tabPane.getSkin()).getBehavior();
