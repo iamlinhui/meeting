@@ -67,6 +67,7 @@ public class SystemTrayUtil {
      * @param text 预定会议室成功
      */
     public static void displayMessage(String text) {
+        // new ProcessBuilder("/usr/bin/osascript", "-e", String.format("display notification \"%s\" with title \"%s\"", Constant.TITLE, text)).start();
         trayIcon.displayMessage(Constant.TITLE, text, TrayIcon.MessageType.INFO);
     }
 
