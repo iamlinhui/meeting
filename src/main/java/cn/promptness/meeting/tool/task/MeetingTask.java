@@ -144,7 +144,7 @@ public class MeetingTask implements Runnable {
         SimpleRetryPolicy policy = new SimpleRetryPolicy(3, Collections.singletonMap(MeetingException.class, true));
         // 设置重试回退操作策略，主要设置重试间隔时间
         FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
-        fixedBackOffPolicy.setBackOffPeriod(3000);
+        fixedBackOffPolicy.setBackOffPeriod(1000);
         retryTemplate.setRetryPolicy(policy);
         retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
         return retryTemplate;
