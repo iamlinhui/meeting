@@ -4,7 +4,11 @@ import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -18,7 +22,7 @@ public class TaskCache {
 
     public static void cache(List<MeetingTaskProperties> meetingTaskPropertiesList) {
         File task = new File(TASK_FILE);
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(task))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(task.toPath()))) {
             for (MeetingTaskProperties meetingTaskProperties : meetingTaskPropertiesList) {
                 oos.writeObject(meetingTaskProperties);
             }
@@ -34,7 +38,7 @@ public class TaskCache {
         if (!task.exists()) {
             return;
         }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(task))) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(task.toPath()))) {
             Object object;
             while ((object = ois.readObject()) != null) {
                 TASK_LIST.add((MeetingTaskProperties) object);
