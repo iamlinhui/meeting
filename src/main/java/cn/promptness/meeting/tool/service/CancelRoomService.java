@@ -12,14 +12,14 @@ import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CancelMeetingRoomService extends BaseService<Void> {
+public class CancelRoomService extends BaseService<Void> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
 
     private List<String> cancelList;
 
-    public CancelMeetingRoomService setCancelList(List<String> cancelList) {
+    public CancelRoomService setCancelList(List<String> cancelList) {
         this.cancelList = cancelList;
         return this;
     }

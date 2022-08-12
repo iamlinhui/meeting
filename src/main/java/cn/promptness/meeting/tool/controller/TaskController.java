@@ -3,15 +3,20 @@ package cn.promptness.meeting.tool.controller;
 import cn.promptness.meeting.tool.cache.TaskCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
+import cn.promptness.meeting.tool.service.RoomDetailService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.task.MeetingTask;
 import cn.promptness.meeting.tool.utils.MeetingUtil;
+import cn.promptness.meeting.tool.utils.ProgressUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,6 +33,7 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -59,6 +65,8 @@ public class TaskController {
     private ComboBox<String> endTime;
     @FXML
     private Button okButton;
+    @Resource
+    private MenuController menuController;
 
     private final ArrayBlockingQueue<ScheduledFuture<?>> taskFutures = new ArrayBlockingQueue<>(1);
     private final ArrayList<String> roomIdList = new ArrayList<>();
@@ -82,6 +90,24 @@ public class TaskController {
             CheckBox checkBox = new CheckBox();
             checkBox.setText(entry.getValue());
             checkBox.setId(entry.getKey());
+            checkBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    // 右键
+                    if (event.getButton().equals(MouseButton.SECONDARY)) {
+                        LocalDate localDate = meetingDate.getValue();
+                        if (localDate == null) {
+                            return;
+                        }
+                        String meetingId = ((CheckBox) event.getSource()).getId();
+
+                        ProgressUtil.of(SystemTrayUtil.getPrimaryStage(),
+                                        applicationContext.getBean(RoomDetailService.class).setParam(localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), meetingId)
+                                                .expect(e -> menuController.login()))
+                                .show();
+                    }
+                }
+            });
             checkBoxList.add(checkBox);
         }
 

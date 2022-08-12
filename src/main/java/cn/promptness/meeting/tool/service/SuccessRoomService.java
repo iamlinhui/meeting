@@ -31,7 +31,7 @@ import java.util.Objects;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class MeetingRoomService extends BaseService<Response<Room>> {
+public class SuccessRoomService extends BaseService<Response<Room>> {
 
     @Resource
     private HttpClientUtil httpClientUtil;
@@ -51,7 +51,7 @@ public class MeetingRoomService extends BaseService<Response<Room>> {
 
     private void listRoom(List<Room> roomList) {
         ArrayList<String> cancelList = new ArrayList<>();
-        ButtonType cancel = new ButtonType("取消会议室");
+        ButtonType cancel = new ButtonType("退订");
 
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(Constant.TITLE);
@@ -95,7 +95,7 @@ public class MeetingRoomService extends BaseService<Response<Room>> {
             if (CollectionUtils.isEmpty(cancelList)) {
                 return;
             }
-            CancelMeetingRoomService cancelMeetingRoomService = applicationContext.getBean(CancelMeetingRoomService.class).setCancelList(cancelList);
+            CancelRoomService cancelMeetingRoomService = applicationContext.getBean(CancelRoomService.class).setCancelList(cancelList);
             ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), cancelMeetingRoomService).show();
         }
     }

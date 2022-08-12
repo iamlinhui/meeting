@@ -5,19 +5,17 @@ import cn.promptness.meeting.tool.cache.AccountCache;
 import cn.promptness.meeting.tool.config.MeetingTaskProperties;
 import cn.promptness.meeting.tool.data.Constant;
 import cn.promptness.meeting.tool.service.CheckLoginService;
-import cn.promptness.meeting.tool.service.MeetingRoomService;
+import cn.promptness.meeting.tool.service.SuccessRoomService;
 import cn.promptness.meeting.tool.service.ValidateUserService;
 import cn.promptness.meeting.tool.utils.ProgressUtil;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
+import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -56,11 +54,18 @@ public class MenuController {
 
     @FXML
     public void about() {
+        Stage primaryStage = SystemTrayUtil.getPrimaryStage();
+        final Hyperlink hyperlink = new Hyperlink("https://pan.holmes.cn/s/1nHN");
+        hyperlink.setOnAction(t -> {
+            HostServices hostServices = (HostServices) primaryStage.getProperties().get(primaryStage);
+            hostServices.showDocument(hyperlink.getText());
+        });
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle(Constant.TITLE);
         alert.setHeaderText("关于");
+        alert.setGraphic(hyperlink);
         alert.setContentText("Version " + buildProperties.getVersion() + "\nPowered By Lynn");
-        alert.initOwner(SystemTrayUtil.getPrimaryStage());
+        alert.initOwner(primaryStage);
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.showAndWait();
     }
@@ -107,7 +112,7 @@ public class MenuController {
 
     @FXML
     public void list() {
-        ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), applicationContext.getBean(MeetingRoomService.class).expect(event -> login())).show();
+        ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), applicationContext.getBean(SuccessRoomService.class).expect(event -> login())).show();
     }
 
     @FXML

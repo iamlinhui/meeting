@@ -14,6 +14,7 @@ public class RoomTime {
     private String startTime;
     @SerializedName("end_time")
     private String endTime;
+    private String min;
 
     public Integer getFlag() {
         return flag;
@@ -37,6 +38,14 @@ public class RoomTime {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public String getMin() {
+        return min;
+    }
+
+    public void setMin(String min) {
+        this.min = min;
     }
 
     @Override
