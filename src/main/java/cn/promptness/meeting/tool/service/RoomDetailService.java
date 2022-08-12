@@ -130,7 +130,7 @@ public class RoomDetailService extends BaseService<Response<Room>> {
         // 1  时间段可用 0 此时间段不可用
         if (roomTime.getFlag() > 0) {
             CheckBox checkBox = new CheckBox();
-            checkBox.setId(roomTime.getStartTime() + "|" + roomTime.getEndTime());
+            checkBox.setId(roomTime.getStartTime());
             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 timeList.remove(checkBox.getId());
                 if (checkBox.isSelected()) {

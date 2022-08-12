@@ -55,28 +55,39 @@ public class ConfirmRoomService extends BaseService<Void> {
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                for (String time : timeList) {
-                    String[] split = time.split("\\|");
-                    Map<String, String> paramMap = getParamMap(split[0], split[1]);
-                    HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, AccountCache.getHeaderList());
-                    Response<?> response = httpResult.getContent(Response.class);
-                    if (response.isSuccess()) {
-                        SystemTrayUtil.displayMessage(String.format("预定%s会议室成功%s(%s~%s)", Constant.ROOM_INFO_MAP.get(roomId), meetingDate, split[0], split[1]));
+                String startTime = null;
+                for (int i = 0; i < Constant.TIME_LIST.size(); i++) {
+                    if (startTime == null && timeList.contains(Constant.TIME_LIST.get(i))) {
+                        startTime = Constant.TIME_LIST.get(i);
                         continue;
                     }
-                    String message = response.getMessage();
-                    final String conflict = "预定的会议室冲突";
-                    if (message.contains(conflict)) {
-                        Platform.runLater(() -> TooltipUtil.show(conflict));
-                        continue;
-                    }
-                    final String future = "只能预定未来7天内的会议室";
-                    if (message.contains(future)) {
-                        Platform.runLater(() -> TooltipUtil.show(future));
+                    if (startTime != null && !timeList.contains(Constant.TIME_LIST.get(i))) {
+                        confirm(startTime, Constant.TIME_LIST.get(i));
+                        startTime = null;
                     }
                 }
                 return null;
             }
         };
+    }
+
+    private void confirm(String startTime, String endTime) throws Exception {
+        Map<String, String> paramMap = getParamMap(startTime, endTime);
+        HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, AccountCache.getHeaderList());
+        Response<?> response = httpResult.getContent(Response.class);
+        if (response.isSuccess()) {
+            SystemTrayUtil.displayMessage(String.format("预定%s会议室成功%s(%s~%s)", Constant.ROOM_INFO_MAP.get(roomId), meetingDate, startTime, endTime));
+            return;
+        }
+        String message = response.getMessage();
+        final String conflict = "预定的会议室冲突";
+        if (message.contains(conflict)) {
+            Platform.runLater(() -> TooltipUtil.show(conflict));
+            return;
+        }
+        final String future = "只能预定未来7天内的会议室";
+        if (message.contains(future)) {
+            Platform.runLater(() -> TooltipUtil.show(future));
+        }
     }
 }
