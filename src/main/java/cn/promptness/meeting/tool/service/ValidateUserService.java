@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -36,8 +35,9 @@ public class ValidateUserService extends BaseService<String> {
                 if (!AccountCache.haveAccount()) {
                     return null;
                 }
-                HttpResult httpResult = httpClientUtil.doGet("https://api.oa.fenqile.com/oa/api/user/session.json?resource_sn=NEWAPR_OA", AccountCache.getHeaderList());
-                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {}.getType());
+                HttpResult httpResult = httpClientUtil.doGet("https://openmoa.oa.fenqile.com/oa/api/user/session.json?resource_sn=LECO", AccountCache.getHeaderList());
+                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {
+                }.getType());
                 if (response.isSuccess()) {
                     return response.getResult().stream().findFirst().orElse(new Session()).getName();
                 }
