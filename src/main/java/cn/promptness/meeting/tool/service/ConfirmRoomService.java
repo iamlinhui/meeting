@@ -76,6 +76,7 @@ public class ConfirmRoomService extends BaseService<Void> {
         HttpResult httpResult = httpClientUtil.doGet("https://m.oa.fenqile.com/meeting/main/due_meeting.json", paramMap, AccountCache.getHeaderList());
         Response<?> response = httpResult.getContent(Response.class);
         if (response.isSuccess()) {
+            Platform.runLater(() -> TooltipUtil.show("成功预定!"));
             SystemTrayUtil.displayMessage(String.format("预定%s会议室成功%s(%s~%s)", Constant.ROOM_INFO_MAP.get(roomId), meetingDate, startTime, endTime));
             return;
         }
