@@ -90,22 +90,16 @@ public class TaskController {
             CheckBox checkBox = new CheckBox();
             checkBox.setText(entry.getValue());
             checkBox.setId(entry.getKey());
-            checkBox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    // 右键
-                    if (event.getButton().equals(MouseButton.SECONDARY)) {
-                        LocalDate localDate = meetingDate.getValue();
-                        if (localDate == null) {
-                            return;
-                        }
-                        String meetingId = ((CheckBox) event.getSource()).getId();
-
-                        ProgressUtil.of(SystemTrayUtil.getPrimaryStage(),
-                                        applicationContext.getBean(RoomDetailService.class).setParam(localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), meetingId)
-                                                .expect(e -> menuController.login()))
-                                .show();
+            checkBox.setOnMouseClicked(event -> {
+                // 右键
+                if (event.getButton().equals(MouseButton.SECONDARY)) {
+                    LocalDate localDate = meetingDate.getValue();
+                    if (localDate == null) {
+                        TooltipUtil.show("请先选择日期!");
+                        return;
                     }
+                    String meetingId = ((CheckBox) event.getSource()).getId();
+                    ProgressUtil.of(SystemTrayUtil.getPrimaryStage(), applicationContext.getBean(RoomDetailService.class).setParam(localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), meetingId).expect(e -> menuController.login())).show();
                 }
             });
             checkBoxList.add(checkBox);
