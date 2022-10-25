@@ -12,11 +12,9 @@ import cn.promptness.meeting.tool.utils.SystemTrayUtil;
 import cn.promptness.meeting.tool.utils.TooltipUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -107,7 +105,7 @@ public class TaskController {
 
         addListener();
         initGridPane();
-        initTask();
+        initTask(TaskCache.getMeetingTaskProperties(getTarget()));
     }
 
     @FXML
@@ -253,8 +251,7 @@ public class TaskController {
         }
     }
 
-    private void initTask() {
-        MeetingTaskProperties meetingTaskProperties = TaskCache.getMeetingTaskProperties(getTarget());
+    public void initTask(MeetingTaskProperties meetingTaskProperties) {
         if (meetingTaskProperties == null) {
             return;
         }

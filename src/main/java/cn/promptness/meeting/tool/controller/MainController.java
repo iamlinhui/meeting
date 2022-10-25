@@ -45,14 +45,18 @@ public class MainController {
     public void initialize() {
         int max = Math.max(1, TaskCache.size());
         for (int i = 0; i < max; i++) {
-            addTab();
+            addTab(false);
         }
     }
 
-    public void addTab() {
+    public void addTab(boolean copy) {
         FXMLLoader loader = springFxmlLoader.getLoader("/fxml/task.fxml");
         Parent load = springFxmlLoader.load(loader);
         TaskController taskController = loader.getController();
+        if (copy) {
+            MeetingTaskProperties meetingTaskProperties = taskMap.get(Integer.valueOf(tabPane.getSelectionModel().getSelectedItem().getId())).buildMeetingTaskProperties();
+            taskController.initTask(meetingTaskProperties);
+        }
         taskMap.put(taskController.getTarget(), taskController);
         Tab tab = this.buildTab(load, taskController);
         tabPane.getTabs().add(tab);
