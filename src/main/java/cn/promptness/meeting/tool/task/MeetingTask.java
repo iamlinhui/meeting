@@ -11,6 +11,8 @@ import cn.promptness.meeting.tool.pojo.Room;
 import cn.promptness.meeting.tool.pojo.RoomTime;
 import cn.promptness.meeting.tool.pojo.TaskEvent;
 import cn.promptness.meeting.tool.utils.SystemTrayUtil;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import org.slf4j.Logger;
@@ -19,21 +21,26 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class MeetingTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
+    private static final String CACHE = "CACHE";
 
     public MeetingTask(MeetingTaskProperties meetingTaskProperties, ConfigurableApplicationContext applicationContext) {
         this.meetingTaskProperties = meetingTaskProperties;
         this.applicationContext = applicationContext;
+        this.cache = this.buildCache();
     }
 
     private final MeetingTaskProperties meetingTaskProperties;
     private final ConfigurableApplicationContext applicationContext;
+    private final Cache<String, List<String>> cache;
 
     @Override
     public void run() {
@@ -50,6 +57,8 @@ public class MeetingTask implements Runnable {
         HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
         // 还未到预定时间
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
+            // 提前准备
+            this.getCache();
             return;
         }
         // 已经过了会议室开始时间
@@ -59,7 +68,7 @@ public class MeetingTask implements Runnable {
         }
         Map<String, String> paramMap = this.getParamMap();
         // 获取菜单 很容易获取不到数据加载重试机制
-        List<String> roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
+        List<String> roomIdList = this.getCache();
         for (String roomId : roomIdList) {
             boolean success = this.getRetryTemplate().execute(retryContext -> this.handle(httpClientUtil, paramMap, roomId), recoveryCallback -> false);
             if (success) {
@@ -146,5 +155,28 @@ public class MeetingTask implements Runnable {
         retryTemplate.setRetryPolicy(policy);
         retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
         return retryTemplate;
+    }
+
+    private Cache<String, List<String>> buildCache() {
+        Cache<String, List<String>> cache = Caffeine.newBuilder().expireAfterWrite(17, TimeUnit.MINUTES).maximumSize(1).build();
+        try {
+            HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
+            // 获取菜单 很容易获取不到数据加载重试机制
+            List<String> roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
+            cache.put(CACHE, roomIdList);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return cache;
+    }
+
+    private List<String> getCache() throws Exception {
+        List<String> roomIdList = cache.getIfPresent(CACHE);
+        if (CollectionUtils.isEmpty(roomIdList)) {
+            HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
+            roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
+            cache.put(CACHE, roomIdList);
+        }
+        return roomIdList;
     }
 }
