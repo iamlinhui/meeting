@@ -82,7 +82,7 @@ public class ProgressUtil {
         Scene scene = new Scene(vBox);
         scene.setFill(null);
         stage.setScene(scene);
-        stage.setWidth(StringUtils.isEmpty(ad) ? 100 : ad.length() * 8d + 10d);
+        stage.setWidth(StringUtils.hasLength(ad) ? ad.length() * 8d + 10d : 100);
         stage.setHeight(100);
 
         // show center of parent

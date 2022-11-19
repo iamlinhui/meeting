@@ -14,9 +14,9 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -36,8 +36,7 @@ public class ValidateUserService extends BaseService<String> {
                     return null;
                 }
                 HttpResult httpResult = httpClientUtil.doGet("https://openmoa.oa.fenqile.com/oa/api/user/session.json?resource_sn=LECO", AccountCache.getHeaderList());
-                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {
-                }.getType());
+                Response<Session> response = httpResult.getContent(new TypeToken<Response<Session>>() {}.getType());
                 if (response.isSuccess()) {
                     return response.getResult().stream().findFirst().orElse(new Session()).getName();
                 }
@@ -49,7 +48,8 @@ public class ValidateUserService extends BaseService<String> {
     @Override
     public Service<String> expect(Callback callback) {
         super.setOnSucceeded(event -> {
-            if (StringUtils.isEmpty(event.getSource().getValue())) {
+            Object value = event.getSource().getValue();
+            if (Objects.isNull(value)) {
                 Stage stage = SystemTrayUtil.getPrimaryStage();
                 if (stage.isIconified()) {
                     stage.setIconified(false);
