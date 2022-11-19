@@ -98,7 +98,21 @@ public class MeetingTask implements Runnable {
         if (!response.isSuccess()) {
             throw new MeetingException(response.getMessage());
         }
-        return response.getResult().stream().filter(this::filterRoom).filter(this::filterTime).map(Room::getRoomId).collect(Collectors.toList());
+        List<String> filterRoomIdList = response.getResult().stream().filter(this::filterRoom).filter(this::filterTime).map(Room::getRoomId).collect(Collectors.toList());
+        if (filterRoomIdList.isEmpty()) {
+            return filterRoomIdList;
+        }
+        if (meetingTaskProperties.getRoomIdList().size() == filterRoomIdList.size()) {
+            return meetingTaskProperties.getRoomIdList();
+        }
+        // 保持原有的添加顺序
+        List<String> roomIdList = new ArrayList<>();
+        for (String roomId : meetingTaskProperties.getRoomIdList()) {
+            if (filterRoomIdList.contains(roomId)) {
+                roomIdList.add(roomId);
+            }
+        }
+        return roomIdList;
     }
 
     private boolean filterTime(Room room) {

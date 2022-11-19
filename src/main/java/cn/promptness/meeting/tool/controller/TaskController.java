@@ -197,15 +197,15 @@ public class TaskController {
     private void checkTime() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
         try {
-            if (StringUtils.isEmpty(startTime.getValue()) || StringUtils.isEmpty(endTime.getValue())) {
-                flag[1] = false;
-            } else {
+            if (StringUtils.hasText(startTime.getValue()) && StringUtils.hasText(endTime.getValue())) {
                 Date parseStartTime = simpleDateFormat.parse(startTime.getValue());
                 Date parseEndTime = simpleDateFormat.parse(endTime.getValue());
                 flag[1] = parseStartTime.before(parseEndTime);
                 if (!flag[1]) {
                     TooltipUtil.show("时间范围不正确!");
                 }
+            } else {
+                flag[1] = false;
             }
         } catch (ParseException e) {
             flag[1] = false;
