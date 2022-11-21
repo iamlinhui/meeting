@@ -55,10 +55,12 @@ public class MeetingTask implements Runnable {
 
     private void meeting() throws Exception {
         HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
+        // 提前准备
+        if (Objects.equals(Boolean.TRUE, meetingTaskProperties.needCache())) {
+            this.getCache();
+        }
         // 还未到预定时间
         if (Objects.equals(Boolean.FALSE, meetingTaskProperties.isEnable())) {
-            // 提前准备
-            this.getCache();
             return;
         }
         // 已经过了会议室开始时间

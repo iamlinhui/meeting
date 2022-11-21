@@ -73,6 +73,12 @@ public class MeetingTaskProperties implements Serializable {
         return !LocalDateTime.now().isBefore(handleDateTime);
     }
 
+    public boolean needCache() {
+        // 9:45之后  开始预热 准备好列表
+        LocalDateTime handleDateTime = meetingDate.plusDays(-7).atTime(LocalTime.of(9, 45));
+        return LocalDateTime.now().isAfter(handleDateTime);
+    }
+
     public boolean checkTimeIsOk() {
         LocalDateTime now = LocalDateTime.now();
         LocalTime localTime = LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm"));
