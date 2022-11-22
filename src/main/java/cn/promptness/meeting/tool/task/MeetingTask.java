@@ -30,17 +30,15 @@ import java.util.stream.Collectors;
 public class MeetingTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(MeetingTask.class);
-    private static final String CACHE = "CACHE";
 
     public MeetingTask(MeetingTaskProperties meetingTaskProperties, ConfigurableApplicationContext applicationContext) {
         this.meetingTaskProperties = meetingTaskProperties;
         this.applicationContext = applicationContext;
-        this.cache = this.buildCache();
     }
 
     private final MeetingTaskProperties meetingTaskProperties;
     private final ConfigurableApplicationContext applicationContext;
-    private final Cache<String, List<String>> cache;
+    private final Cache<Class<MeetingTask>, List<String>> cache = Caffeine.newBuilder().expireAfterWrite(17, TimeUnit.MINUTES).maximumSize(1).build();
 
     @Override
     public void run() {
@@ -173,25 +171,12 @@ public class MeetingTask implements Runnable {
         return retryTemplate;
     }
 
-    private Cache<String, List<String>> buildCache() {
-        Cache<String, List<String>> cache = Caffeine.newBuilder().expireAfterWrite(17, TimeUnit.MINUTES).maximumSize(1).build();
-        try {
-            HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
-            // 获取菜单 很容易获取不到数据加载重试机制
-            List<String> roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
-            cache.put(CACHE, roomIdList);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return cache;
-    }
-
     private List<String> getCache() throws Exception {
-        List<String> roomIdList = cache.getIfPresent(CACHE);
+        List<String> roomIdList = cache.getIfPresent(MeetingTask.class);
         if (CollectionUtils.isEmpty(roomIdList)) {
             HttpClientUtil httpClientUtil = applicationContext.getBean(HttpClientUtil.class);
             roomIdList = this.getRetryTemplate().execute(retryContext -> this.filterRoomIdList(httpClientUtil));
-            cache.put(CACHE, roomIdList);
+            cache.put(MeetingTask.class, roomIdList);
         }
         return roomIdList;
     }
