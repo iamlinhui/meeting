@@ -149,7 +149,8 @@ public class MeetingTask implements Runnable {
             log.error(conflict);
             return false;
         }
-        final String future = "只能预定未来7天内的会议室";
+        // 只能预定未来7天内的会议室  只能预定未来6天内的会议室
+        final String future = "只能预定未来";
         if (message.contains(future)) {
             log.error(future);
             // 重试
