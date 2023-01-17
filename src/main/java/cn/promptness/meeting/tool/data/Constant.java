@@ -37,6 +37,7 @@ public class Constant {
         ROOM_INFO_MAP.put("17", "26F 苏黎世·班霍夫大街");
         ROOM_INFO_MAP.put("19", "26F 北京·金融街");
         ROOM_INFO_MAP.put("47", "26F 卢森堡·皇家大道");
+        ROOM_INFO_MAP.put("34", "27F 多伦多·卑街");
     }
 
 }
