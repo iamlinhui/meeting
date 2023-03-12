@@ -1,3 +1,6 @@
+### 会议室助手
+![img.png](img.png)
+
 ```text
 init-method="init"
     说明在创建完对象后，立刻执行init方法，用来进行初始化
